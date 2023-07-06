@@ -1,0 +1,2 @@
+langchain==0.0.221
+wikipedia==1.4.0
