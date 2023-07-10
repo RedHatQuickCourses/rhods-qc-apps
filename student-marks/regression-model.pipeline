@@ -7,7 +7,166 @@
   "pipelines": [
     {
       "id": "primary",
-      "nodes": [],
+      "nodes": [
+        {
+          "id": "517f3baa-f659-42f1-b06b-a9942105242b",
+          "type": "execution_node",
+          "op": "execute-notebook-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [
+                "data/student_marks.csv"
+              ],
+              "include_subdirectories": false,
+              "outputs": [
+                "build/model.joblib"
+              ],
+              "env_vars": [],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "train.ipynb"
+            },
+            "label": "",
+            "ui_data": {
+              "label": "train.ipynb",
+              "image": "/notebook/my-test-project/my-test-workbench/static/elyra/notebook.svg",
+              "x_pos": 176,
+              "y_pos": 161,
+              "description": "Run notebook file"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              }
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "d2b05fc3-32fe-4045-8843-d97546eb2440",
+          "type": "execution_node",
+          "op": "execute-notebook-node",
+          "app_data": {
+            "component_parameters": {
+              "dependencies": [
+                "to_onnx.requirements.txt"
+              ],
+              "include_subdirectories": false,
+              "outputs": [
+                "build/model.*.onnx"
+              ],
+              "env_vars": [
+                {
+                  "env_var": "BUILD_ID",
+                  "value": "$(context.pipelineRun.uid)"
+                }
+              ],
+              "kubernetes_pod_annotations": [],
+              "kubernetes_pod_labels": [],
+              "kubernetes_secrets": [
+                {
+                  "env_var": "AWS_ACCESS_KEY_ID",
+                  "name": "aws-connection-model-storage",
+                  "key": "AWS_ACCESS_KEY_ID"
+                },
+                {
+                  "env_var": "AWS_DEFAULT_REGION",
+                  "name": "aws-connection-model-storage",
+                  "key": "AWS_DEFAULT_REGION"
+                },
+                {
+                  "env_var": "AWS_S3_BUCKET",
+                  "name": "aws-connection-model-storage",
+                  "key": "AWS_S3_BUCKET"
+                },
+                {
+                  "env_var": "AWS_S3_ENDPOINT",
+                  "name": "aws-connection-model-storage",
+                  "key": "AWS_S3_ENDPOINT"
+                },
+                {
+                  "env_var": "AWS_SECRET_ACCESS_KEY",
+                  "name": "aws-connection-model-storage",
+                  "key": "AWS_SECRET_ACCESS_KEY"
+                }
+              ],
+              "kubernetes_shared_mem_size": {},
+              "kubernetes_tolerations": [],
+              "mounted_volumes": [],
+              "filename": "to_onnx.ipynb"
+            },
+            "label": "",
+            "ui_data": {
+              "label": "to_onnx.ipynb",
+              "image": "/notebook/my-test-project/my-test-workbench/static/elyra/notebook.svg",
+              "x_pos": 388,
+              "y_pos": 161,
+              "description": "Run notebook file"
+            }
+          },
+          "inputs": [
+            {
+              "id": "inPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Input Port"
+                }
+              },
+              "links": [
+                {
+                  "id": "ac577b88-c208-4e63-9d35-1a6af05bca08",
+                  "node_id_ref": "517f3baa-f659-42f1-b06b-a9942105242b",
+                  "port_id_ref": "outPort"
+                }
+              ]
+            }
+          ],
+          "outputs": [
+            {
+              "id": "outPort",
+              "app_data": {
+                "ui_data": {
+                  "cardinality": {
+                    "min": 0,
+                    "max": -1
+                  },
+                  "label": "Output Port"
+                }
+              }
+            }
+          ]
+        }
+      ],
       "app_data": {
         "ui_data": {
           "comments": []
@@ -16,7 +175,18 @@
         "runtime_type": "KUBEFLOW_PIPELINES",
         "properties": {
           "name": "regression-model",
-          "runtime": "Data Science Pipelines"
+          "runtime": "Data Science Pipelines",
+          "pipeline_defaults": {
+            "kubernetes_pod_labels": [],
+            "kubernetes_tolerations": [],
+            "kubernetes_pod_annotations": [],
+            "mounted_volumes": [],
+            "kubernetes_shared_mem_size": {},
+            "env_vars": [],
+            "kubernetes_secrets": [],
+            "runtime_image": "quay.io/modh/runtime-images@sha256:27f12a510a034212ce4d579a970cce7aeeb33ffa32044fe88a262ae15d34e763"
+          },
+          "pipeline_parameters": []
         }
       },
       "runtime_ref": ""
