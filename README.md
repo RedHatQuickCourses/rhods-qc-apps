@@ -1,1 +1,1 @@
-# rhods-qc-apps
+This repository contains the source code for the 6 RHODS quick courses. Create appropriately named folder here and then put your notebooks, code and snippets in this repo and refer to them in your hands-on labs
