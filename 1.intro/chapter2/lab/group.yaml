@@ -3,5 +3,5 @@ kind: Group
 metadata:
   name: data-scientists
 users:
-  - user-4
-  - user-5
+  - user4
+  - user5
