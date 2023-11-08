@@ -157,12 +157,12 @@
               "kubernetes_shared_mem_size": {},
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
-              "filename": "5. model_upload.ipynb",
+              "filename": "5.model_upload.ipynb",
               "runtime_image": "quay.io/modh/runtime-images@sha256:7dd23e58291cad7a0ab4a8e04bda06492f2c027eb33b226358380db58dcdd60b"
             },
             "label": "",
             "ui_data": {
-              "label": "5. model_upload.ipynb",
+              "label": "5.model_upload.ipynb",
               "image": "/notebook/rhods-intro-s2/hit-roads/static/elyra/notebook.svg",
               "x_pos": 724,
               "y_pos": 161,
