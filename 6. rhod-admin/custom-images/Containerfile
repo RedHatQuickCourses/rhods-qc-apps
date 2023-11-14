@@ -1,0 +1,17 @@
+#BASE_IMAGE
+#This is the Jupyter Data Science Workbench image
+####################################################################
+# TODO - Add the command to use the Jupyter Data Science Workbench #
+####################################################################
+
+
+# Copying custom packages
+# The requirements.txt file contains additional package dependencies we want installed
+###########################################################
+# TODO - Add the command to copy the requirements file    #
+###########################################################
+
+
+# Fix permissions to support pip in Openshift environments \
+RUN chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
+    fix-permissions /opt/app-root -P
