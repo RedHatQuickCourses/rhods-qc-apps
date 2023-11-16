@@ -7,7 +7,7 @@ Your task is to complete the missing parts of those notebooks and create a data 
 
 ## Prerequisites
 
-The lab scenario assumes that the dataset is available in the S3 bucket that you have created in the [RHODS administration quick course](https://redhatquickcourses.github.io/rhods-admin/rhods-admin/1.33/index.html).
+The lab scenario assumes that the dataset is available in the same `fraud-detection-bucket` S3 bucket that you have used in the [RHODS pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/chapter1/section2.html#_data_science_pipeline_hands_on_example).
 
 You will also use the same bucket to store the trained model and pipeline output reports.
 
@@ -29,7 +29,7 @@ Alternatively, you can download the dataset from Kaggle (https://www.kaggle.com/
 
 ## Specifications
 
-* Perform your exercise in a TensorFlow workbench.
+* Perform your exercise in the [fraud detection workbench](quay.io/mmurakam/runtimes:fraud-detection-v0.1.0).
 Make sure that the workbench is associated to a data connection that includes your S3 connection settings.
 Make sure that the workbench size is at least `Medium`.
 
@@ -59,7 +59,6 @@ Use the `4.model_upload` notebook.
 
 * Create a model server and serve the model that you uploaded to S3.
 Expose the model via an external route.
-The model framework must be `onnx` version 1.
 
 * Test that you can consume the deployed model by using the `6.test` notebook.
 
