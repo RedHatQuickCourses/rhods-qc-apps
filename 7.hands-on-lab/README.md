@@ -29,7 +29,7 @@ Alternatively, you can download the dataset from Kaggle (https://www.kaggle.com/
 
 ## Specifications
 
-* Perform your exercise in the [fraud detection workbench](quay.io/mmurakam/runtimes:fraud-detection-v0.1.0).
+* Perform your exercise in the [fraud detection workbench](quay.io/mmurakam/workbenches:fraud-detection-v1.0.1).
 Make sure that the workbench is associated to a data connection that includes your S3 connection settings.
 Make sure that the workbench size is at least `Medium`.
 
