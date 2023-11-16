@@ -284,27 +284,27 @@
             "kubernetes_secrets": [
               {
                 "env_var": "AWS_ACCESS_KEY_ID",
-                "name": "aws-connection-my-first-data-connection",
+                "name": "aws-connection-minio",
                 "key": "AWS_ACCESS_KEY_ID"
               },
               {
                 "env_var": "AWS_DEFAULT_REGION",
-                "name": "aws-connection-my-first-data-connection",
+                "name": "aws-connection-minio",
                 "key": "AWS_DEFAULT_REGION"
               },
               {
                 "env_var": "AWS_S3_BUCKET",
-                "name": "aws-connection-my-first-data-connection",
+                "name": "aws-connection-minio",
                 "key": "AWS_S3_BUCKET"
               },
               {
                 "env_var": "AWS_S3_ENDPOINT",
-                "name": "aws-connection-my-first-data-connection",
+                "name": "aws-connection-minio",
                 "key": "AWS_S3_ENDPOINT"
               },
               {
                 "env_var": "AWS_SECRET_ACCESS_KEY",
-                "name": "aws-connection-my-first-data-connection",
+                "name": "aws-connection-minio",
                 "key": "AWS_SECRET_ACCESS_KEY"
               }
             ],
