@@ -31,7 +31,7 @@ Alternatively, you can download the dataset from Kaggle (https://www.kaggle.com/
 
 * Perform your exercise in the [fraud detection workbench](quay.io/mmurakam/workbenches:fraud-detection-v1.0.1).
 Make sure that the workbench is associated to a data connection that includes your S3 connection settings.
-Make sure that the workbench size is at least `Medium`.
+Make sure that the workbench size is at least `Small`.
 
 * Clone the https://github.com/RedHatQuickCourses/rhods-qc-apps repository into your workbench.
 The materials for this lab are located in the `7.hands-on-lab/` directory.
