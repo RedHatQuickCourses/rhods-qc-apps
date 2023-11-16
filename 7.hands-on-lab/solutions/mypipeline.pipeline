@@ -288,11 +288,6 @@
                 "key": "AWS_ACCESS_KEY_ID"
               },
               {
-                "env_var": "AWS_DEFAULT_REGION",
-                "name": "aws-connection-minio",
-                "key": "AWS_DEFAULT_REGION"
-              },
-              {
                 "env_var": "AWS_S3_BUCKET",
                 "name": "aws-connection-minio",
                 "key": "AWS_S3_BUCKET"
