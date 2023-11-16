@@ -28,7 +28,7 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "3.preprocessing.ipynb",
-              "runtime_image": "quay.io/modh/runtime-images@sha256:7dd23e58291cad7a0ab4a8e04bda06492f2c027eb33b226358380db58dcdd60b"
+              "runtime_image": "quay.io/mmurakam/runtimes:fraud-detection-v0.1.0"
             },
             "label": "",
             "ui_data": {
@@ -94,7 +94,7 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "4.model_training.ipynb",
-              "runtime_image": "quay.io/modh/runtime-images@sha256:8df90db22b29afb1cd9c81d52be9145fed50e3b04ec80bb7ea7ecaa7476dbe5c"
+              "runtime_image": "quay.io/mmurakam/runtimes:fraud-detection-v0.1.0"
             },
             "label": "",
             "ui_data": {
@@ -158,7 +158,7 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "5.model_upload.ipynb",
-              "runtime_image": "quay.io/modh/runtime-images@sha256:7dd23e58291cad7a0ab4a8e04bda06492f2c027eb33b226358380db58dcdd60b"
+              "runtime_image": "quay.io/mmurakam/runtimes:fraud-detection-v0.1.0"
             },
             "label": "",
             "ui_data": {
@@ -224,7 +224,7 @@
               "kubernetes_tolerations": [],
               "mounted_volumes": [],
               "filename": "1.collect.ipynb",
-              "runtime_image": "quay.io/modh/runtime-images@sha256:7dd23e58291cad7a0ab4a8e04bda06492f2c027eb33b226358380db58dcdd60b"
+              "runtime_image": "quay.io/mmurakam/runtimes:fraud-detection-v0.1.0"
             },
             "label": "",
             "ui_data": {
@@ -308,7 +308,7 @@
                 "key": "AWS_SECRET_ACCESS_KEY"
               }
             ],
-            "runtime_image": "quay.io/modh/runtime-images@sha256:8df90db22b29afb1cd9c81d52be9145fed50e3b04ec80bb7ea7ecaa7476dbe5c"
+            "runtime_image": "quay.io/mmurakam/runtimes:fraud-detection-v0.1.0"
           }
         }
       },

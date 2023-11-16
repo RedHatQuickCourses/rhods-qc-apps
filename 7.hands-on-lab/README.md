@@ -56,6 +56,7 @@ Use the `4.model_upload` notebook.
 
   In this case, you must build a pipeline to train a model.
  This pipeline must collect training data, preprocess the data, train the model, and upload the trained model.
+ You can use the `quay.io/mmurakam/runtimes:fraud-detection-v0.1.0` runtime image for this pipeline.
 
 * Create a model server and serve the model that you uploaded to S3.
 Expose the model via an external route.
