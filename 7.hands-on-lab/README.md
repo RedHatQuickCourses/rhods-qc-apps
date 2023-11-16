@@ -1,9 +1,9 @@
 # Hands-on Lab: Hit the RHODS
 
-In this exercise, you will create a complete data science project for detecting fraudulent credit card transactions.
+In this exercise, you will complete the data science project for detecting fraudulent credit card transactions. In the previous exercise, you have seen how to run pipelines for detecting fraudulent transactions using a pre-trained model. Let's now create a new version of this model and deploy it!
 
 The lab materials include notebooks that implement parts of the project workflow.
-Your task is to complete the missing parts of those notebooks and create a data science pipeline to meet the lab specifications.
+Your task is to complete the missing parts of those notebooks and create a data science pipeline and serve the model to meet the lab specifications.
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ After training, add the code to convert the model to ONNX format.
 Use the `4.model_upload` notebook.
 
 * Create a data science pipeline.
- Note that, in the [pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/index.html) you already created a pipeline for offline fraud detection, that is, for classification of live transactions given a pretrained model file.
+ Note that, in the [pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/index.html) you already created a pipeline for offline scoring, that is, for classification of unlabeled transactions given a pretrained model file.
 
   In this case, you must build a pipeline to train a model.
  This pipeline must collect training data, preprocess the data, train the model, and upload the trained model.
