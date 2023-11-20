@@ -1,0 +1,4 @@
+numpy==1.24.4
+matplotlib==3.6.3
+scikit-learn==1.2.2
+skl2onnx==1.15.0
