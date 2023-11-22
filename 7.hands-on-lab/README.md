@@ -1,6 +1,6 @@
 # Hands-on Lab: Hit the RHODS
 
-In this exercise, you will complete the data science project for detecting fraudulent credit card transactions. In the previous exercise, you have seen how to run pipelines for detecting fraudulent transactions using a pre-trained model. Let's now create a new version of this model and deploy it!
+In this exercise, you will complete the data science project for detecting fraudulent credit card transactions. In the [previous exercise](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/chapter1/section2.html#_exercise_offline_scoring_for_fraud_detection), you have seen how to run pipelines for detecting fraudulent transactions using a pre-trained model. Let's now create a new version of this model and deploy it!
 
 The lab materials include notebooks that implement parts of the project workflow.
 Your task is to complete the missing parts of those notebooks and create a data science pipeline and serve the model to meet the lab specifications.
@@ -45,7 +45,7 @@ Alternatively, you can download the dataset from Kaggle (https://www.kaggle.com/
 
 ## Specifications
 
-* Perform your exercise in the [fraud detection workbench](`quay.io/mmurakam/workbenches:fraud-detection-v1.0.1`).
+* Perform your exercise in the fraud detection workbench (`quay.io/mmurakam/workbenches:fraud-detection-v1.0.1`).
 Make sure that the workbench is associated to a data connection that includes your S3 connection settings.
 Make sure that the workbench size is at least `Small`.
 
