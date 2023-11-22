@@ -1,0 +1,4 @@
+[NOTE]
+====
+This example is supplemental material and is not yet included in the https://redhatquickcourses.github.io/rhods-deploy[RHOAI models deployment course].
+====
