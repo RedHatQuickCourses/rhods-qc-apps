@@ -7,6 +7,22 @@ Your task is to complete the missing parts of those notebooks and create a data 
 
 ## Prerequisites
 
+
+> **❗ IMPORTANT**
+>
+> Before working on this exercise, make sure that you have taken RHODS quick courses:
+>
+> * [Introduction to Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-intro)
+> * [Red Hat OpenShift AI Administration](https://redhatquickcourses.github.io/rhods-admin)
+> * [Data Analysis and Visualization with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-analysis)
+> * [Creating Machine Learning Models with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-model)
+> * [Deploying Machine Learning Models with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-deploy)
+> * [Automation using Data Science Pipelines](https://redhatquickcourses.github.io/rhods-pipelines)
+>
+> Use the same cluster that you have been using for the preceding courses.
+>
+> If you still want to proceed with this lab without taking the courses, you can use the [Base RHODS on AWS demo environment](https://demo.redhat.com/catalog?search=rhods+aws&item=babylon-catalog-prod%2Fsandboxes-gpte.ocp4-workshop-rhods-base-aws.prod).
+
 The lab scenario assumes that the dataset is available in the same `fraud-detection-bucket` S3 bucket that you have used in the [RHODS pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/chapter1/section2.html#_data_science_pipeline_hands_on_example).
 
 You will also use the same bucket to store the trained model and pipeline output reports.
@@ -16,7 +32,7 @@ The dataset is a CSV file called `credictcard.csv`.
 
 > **NOTE**
 >
-> If you have not initialized your S3 store in the administration course, then you can follow these steps:
+> If you have not initialized your S3 store in the [administration course](https://redhatquickcourses.github.io/rhods-admin), then you can follow these steps:
 >
 > * Create the S3 object store.
 > You can create an s3 object store with Minio, by using this guide:  https://ai-on-openshift.io/tools-and-applications/minio/minio/.
