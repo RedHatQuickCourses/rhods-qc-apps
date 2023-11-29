@@ -10,7 +10,9 @@ def load_model(model_file_name=''):
     s3_access_key = environ.get('AWS_ACCESS_KEY_ID')
     s3_secret_key = environ.get('AWS_SECRET_ACCESS_KEY')
     s3_bucket_name = environ.get('AWS_S3_BUCKET')
-    model_object_name = model_file_name or environ.get('model_object_name')
+    model_object_name = model_file_name or environ.get(
+        'model_object_name', 'model-latest.onnx'
+    )
 
     print(f'Downloading model "{model_object_name}" '
           f'from bucket {s3_bucket_name} '
