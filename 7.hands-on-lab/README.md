@@ -23,7 +23,7 @@ Your task is to complete the missing parts of those notebooks and create a data 
 >
 > If you still want to proceed with this lab without taking the courses, you can use the [Base RHODS on AWS demo environment](https://demo.redhat.com/catalog?search=rhods+aws&item=babylon-catalog-prod%2Fsandboxes-gpte.ocp4-workshop-rhods-base-aws.prod).
 
-The lab scenario assumes that the dataset is available in the same `fraud-detection-bucket` S3 bucket that you have used in the [RHODS pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/chapter1/section2.html#_data_science_pipeline_hands_on_example).
+The lab scenario assumes that the dataset is available in the same `fraud-detection` S3 bucket that you have used in the [RHODS pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/chapter1/section2.html#_data_science_pipeline_hands_on_example).
 
 You will also use the same bucket to store the trained model and pipeline output reports.
 
