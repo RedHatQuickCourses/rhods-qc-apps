@@ -78,6 +78,8 @@ Use the `4.model_upload` notebook.
 Expose the model via an external route.
 
 * Test that you can consume the deployed model by using the `6.test` notebook.
+To consume the model, you must send a request that uses the [KServe inference API format](https://github.com/kserve/kserve/blob/master/docs/predict-api/v2/required_api.md#inference).
+Use `dense_input` as the inputs name. 
 
 
 You can find the solutions in the `solutions` directory.
