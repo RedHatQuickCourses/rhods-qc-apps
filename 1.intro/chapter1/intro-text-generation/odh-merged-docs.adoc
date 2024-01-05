@@ -1,0 +1,3793 @@
+:_module-type: PROCEDURE
+
+[id="accessing-the-pipeline-editor_{context}"]
+= Accessing the pipeline editor
+
+[role='_abstract']
+You can use Elyra to create visual end-to-end pipeline workflows in JupyterLab. Elyra is an extension for JupyterLab that provides you with a Pipeline Editor to create pipeline workflows that can be executed in {productname-short}.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+* You have access to S3-compatible storage.
+
+.Procedure
+. After you open JupyterLab, confirm that the JupyterLab launcher is automatically displayed.
+. In the *Elyra* section of the JupyterLab launcher, click the *Pipeline Editor* tile.
++
+The Pipeline Editor opens.
+
+.Verification
+* You can view the Pipeline Editor in JupyterLab.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id='accessing-tutorials_{context}']
+= Accessing tutorials
+
+[role='_abstract']
+You can access learning resources for {productname-long} and supported applications.
+
+.Prerequisites
+* Ensure that you have logged in to {productname-long}.
+* You have logged in to the {openshift-platform} web console.
+
+.Procedure
+. On the {productname-long} home page, click *Resources*.
++
+The *Resources* page opens.
+. Click *Access tutorial* on the relevant card.
+
+.Verification
+* You can view and access the learning resources for {productname-long} and supported applications.
+
+ifndef::upstream[]
+[role='_additional-resources']
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/common-questions_get-started[Common questions].
+endif::[]
+:_module-type: PROCEDURE
+
+[id="adding-a-custom-model-serving-runtime_{context}"]
+= Adding a custom model-serving runtime
+
+A model-serving runtime provides integration with a specified model server and the model frameworks that it supports. By default, {productname-long} includes the OpenVINO Model Server runtime. However, if this runtime doesn't meet your needs (it doesn't support a particular model framework, for example), you might want to add your own, custom runtimes.
+
+As an administrator, you can use the {productname-short} interface to add and enable custom model-serving runtimes. You can then choose from your enabled runtimes when you create a new model server.
+
+[role='_abstract']
+
+.Prerequisites
+* You have logged in to {productname-short} as an administrator.
+ifdef::upstream[]
+* You are familiar with how to link:{odhdocshome}/working-on-data-science-projects/#adding-a-model-server-to-your-data-science-project_nb-server[add a model server to your project]. When you have added a custom model-serving runtime, you must configure a new model server to use the runtime.
+endif::[]
+ifndef::upstream[]
+* You are familiar with how to link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#adding-a-model-server-to-your-data-science-project_nb-server[add a model server to your project]. When you have added a custom model-serving runtime, you must configure a new model server to use the runtime.
+endif::[]
+* You have reviewed the example runtimes in the https://github.com/kserve/modelmesh-serving/tree/main/config/runtimes[kserve/modelmesh-serving^] repository. You can use these examples as _starting points_. However, each runtime requires some further modification before you can deploy it in {productname-short}. The required modifications are described in the following procedure.
++
+NOTE: {productname-short} includes the OpenVINO Model Server model-serving runtime by default. You do not need to add this runtime to {productname-short}.
+
+.Procedure
+. From the {productname-short} dashboard, click *Settings* > *Serving runtimes*.
++
+The *Serving runtimes* page opens and shows the model-serving runtimes that are already installed and enabled in your {productname-short} deployment. By default, the OpenVINO Model Server runtime is pre-installed and enabled in {productname-short}.
+. To add a new, custom runtime, click *Add serving runtime*.
++
+The *Add serving runtime* page opens.
+. To start adding a new runtime, perform one of the following sets of actions:
++
+--
+* *To upload a YAML file*
+.. Click *Upload files*.
++
+A file browser opens.
+.. In the file browser, select a YAML file on your computer. This file might be the one of the example runtimes that you downloaded from the https://github.com/kserve/modelmesh-serving/tree/main/config/runtimes[kserve/modelmesh-serving^] repository.
++
+The embedded YAML editor opens and shows the contents of the file that you uploaded.
+
+* *To enter YAML code directly in the editor*
+.. Click *Start from scratch*.
++
+The embedded YAML editor opens with no content.
+.. Enter or paste YAML code directly in the embedded editor. The YAML that you paste might be copied from one of the example runtimes in the https://github.com/kserve/modelmesh-serving/tree/main/config/runtimes[kserve/modelmesh-serving^] repository.
+--
+
+. Optional: If you are adding one of the example runtimes in the https://github.com/kserve/modelmesh-serving/tree/main/config/runtimes[kserve/modelmesh-serving^] repository, perform the following modifications:
+.. In the YAML editor, locate the `kind` field for your runtime. Update the value of this field to `ServingRuntime`.
+.. In the YAML editor, locate the `containers.image` field for your runtime. Based on the runtime that you are adding, update the field to one of the following:
++
+--
+Nvidia Triton Inference Server::
++
+`image: nvcr.io/nvidia/tritonserver:21.06.1-py3`
+
+Seldon Python MLServer::
++
+`image: seldonio/mlserver:0.5.2`
+
+TorchServe::
++
+`image: pytorch/torchserve:0.6.0-cpu`
+--
+
+. In the `metadata.name` field, ensure that the value of the runtime you are adding is unique (that is, the value isn't the same as for a runtime you have already added).
+
+. Optional: To configure a custom display name for the runtime that you are adding, add a `metadata.annotations.openshift.io/display-name` field and specify a value, as shown in the following example:
++
+[source]
+----
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: mlserver-0.x
+  annotations:
+    openshift.io/display-name: MLServer
+----
++
+NOTE: If you do not configure a custom display name for your runtime, {productname-short} shows the value of the `metadata.name` field.
+
+. Click *Add*.
++
+The *Serving runtimes* page opens and shows the updated list of runtimes that are installed. Observe that the runtime you added is automatically enabled.
+
+. Optional: To edit your custom runtime, click the action menu (&#8942;) and select *Edit*.
++
+NOTE: You cannot directly edit the OpenVINO Model Server runtime that is included in {productname-short} by default. However, you can _clone_ this runtime and edit the cloned version. You can then add the edited clone as a new, custom runtime. To do this, click the action menu beside the OpenVINO Model Server and select *Clone*.
+
+.Verification
+* The model-serving runtime you added is shown in an enabled state on the *Serving runtimes* page.
+
+[role='_additional-resources']
+.Additional resources
+ifdef::upstream[]
+* To learn how to configure a model server that uses a custom model-serving runtime that you have added, see link:{odhdocshome}/working-on-data-science-projects/#adding-a-model-server-to-your-data-science-project_nb-server[Adding a model server to your data science project].
+endif::[]
+ifndef::upstream[]
+* To learn how to configure a model server that uses a custom model-serving runtime that you have added, see link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#adding-a-model-server-to-your-data-science-project_nb-server[Adding a model server to your data science project].
+endif::[]
+:_module-type: PROCEDURE
+
+[id="adding-a-data-connection-to-your-data-science-project_{context}"]
+= Adding a data connection to your data science project
+
+[role='_abstract']
+You can enhance your data science project by adding a connection to a data source. When you want to work with a very large data sets, you can store your data in an Amazon Web Services (AWS) Simple Storage Service (S3) bucket so that you do not fill up your local storage. You also have the option of associating the data connection with an existing workbench that does not already have a connection.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that you can add a data connection to.
+* If you intend to add the data connection to an existing workbench, you have saved any data in the workbench to avoid losing work.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to add a data connection to.
++
+A project details page opens.
+. In the *Data connections* section of the page, click *Add data connection*.
++
+The *Add data connection* dialog opens.
+. Enter a *name* for the data connection.
+. Enter your access key ID for Amazon Web Services in the *AWS_ACCESS_KEY_ID* field.
+. Enter your secret access key for the account you specified in the *AWS_SECRET_ACCESS_KEY_ID* field.
+. Enter the endpoint of your AWS S3 storage in the *AWS_S3_ENDPOINT* field.
+. Enter the default region of your AWS account in the *AWS_DEFAULT_REGION* field.
+. Enter the name of the AWS S3 bucket in the *AWS_S3_BUCKET* field.
+. Click *Add data connection*.
+
+.Verification
+* The data connection that you added appears in the *Data connections* section on the *Details* page for the project.
+* If you selected a workbench, the data connection is visible in the *Workbenches* section on your data science project page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="adding-cluster-storage-to-your-data-science-project_{context}"]
+= Adding cluster storage to your data science project
+
+[role='_abstract']
+For data science projects that require data to be retained, you can add cluster storage to the project. Additionally, you can also connect cluster storage to a specific project's workbench.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that you can add cluster storage to.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to add the cluster storage to.
++
+A project details page opens.
+. In the *Cluster storage* section of the page, click *Add cluster storage*.
++
+The *Add storage* dialog opens.
+. Enter a *name* for the cluster storage.
+. Enter a *description* for the cluster storage.
+. Under *Persistent storage size*, enter a new size in gibibytes. The minimum size is 1 GiB, and the maximum size is 16384 GiB.
+. Optional: Select a *workbench* from the list to connect the cluster storage to an existing workbench.
+. If you selected a workbench to connect the storage to, enter the storage directory in the *Mount folder* field.
+. Click *Add storage*.
+
+.Verification
+* The cluster storage that you added appears in the *Cluster storage* section on the *Details* page for the project.
+* A new persistent volume claim (PVC) is created with the storage size that you defined.
+* The persistent volume claim (PVC) is visible as an attached storage in the *Workbenches* section on the *Details* page for the project.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="cloning-a-scheduled-pipeline-run_{context}"]
+= Cloning a scheduled pipeline run
+
+[role='_abstract']
+To make it easier to schedule runs to execute as part of your pipeline configuration, you can duplicate existing scheduled runs by cloning them.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+* You have imported a pipeline to an active pipeline server.
+* You have previously scheduled a run that is available to clone.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. Click the action menu (*&#8942;*) beside the relevant run and click *Clone*.
++
+The *Clone* page opens.
+. From the *Project* list, select the project that contains the pipeline whose run that you want to clone.
+. In the *Name* field, enter a name for the run that you want to clone.
+. In the *Description* field, enter a description for the run that you want to clone.
+. From the *Pipeline* list, select the pipeline containing the run that you want to clone.
+. To configure the run type for the run that you are cloning, in the *Run type* section, perform one of the following sets of actions:
+* Select *Run once immediately after create* to specify the run that you are cloning executes once, and immediately after its creation. If you selected this option, skip to step 10.
+* Select *Schedule recurring run* to schedule the run that you are cloning to recur.
+. If you selected *Schedule recurring run* in the previous step, configure the trigger type for the run, perform one of the following actions:
+* Select *Periodic* and select the execution frequency from the *Run every* list.
+* Select *Cron* to specify the execution schedule in `cron` format. This creates a cron job to execute the run. Click the *Copy* button (image:images/osd-copy.png[]) to copy the cron job schedule to the clipboard. The field furthest to the left represents seconds. For more information about scheduling tasks using the supported `cron` format, see link:https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format[Cron Expression Format].
+. If you selected *Schedule recurring run* in step 7, configure the duration for the run that you are cloning.
+.. Select the *Start date* check box to specify a start date for the run. Select the start date using the calendar tool and the start time from the list of times.
+.. Select the *End date* check box to specify an end date for the run. Select the end date using the calendar tool and the end time from the list of times.
+. In the *Parameters* section, configure the input parameters for the run that you are cloning by selecting the appropriate parameters from the list.
+. Click *Create*.
+
+.Verification
+* The pipeline run that you cloned is shown in the *Scheduled* tab on the *Runs* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: REFERENCE
+
+[id="common-questions_{context}"]
+= Common questions
+
+[role="_abstract"]
+In addition to documentation, Red Hat provides a rich set of learning resources for {productname-short} and supported applications.
+
+On the *Resources* page of the {productname-short} dashboard, you can use the category links to filter the resources for various stages of your data science workflow.
+For example, click the *Model serving* category to display resources that describe various methods of deploying models.
+Click *All items* to show the resources for all categories.
+
+For the selected category, you can apply additional options to filter the available resources.
+For example, you can filter by type, such as how-to articles, quick starts, tutorials; these resources provide the answers to common questions.
+:_module-type: CONCEPT
+
+[id='configuring-access-to-data-science-projects_{context}']
+= Configuring access to data science projects
+
+[role='_abstract']
+To enable you to work collaboratively on your data science projects with other users, you can share access to your project. After creating your project, you can then set the appropriate access permissions from the {productname-short} user interface.
+
+You can assign the following access permission levels to your data science projects:
+
+** Admin - Users can modify all areas of a project, including its details (project name and description), components, and access permissions.
+** Edit - Users can modify a project's components, such as its workbench, but they cannot edit a project's access permissions or its details (project name and description).
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='adding-a-model-server-to-your-data-science-project_{context}']
+= Adding a model server to your data science project
+
+[role='_abstract']
+Before you can successfully deploy a data science model on {productname-short}, you must configure a model server. This includes configuring the number of replicas being deployed, the server size, the token authorization, and how the project is accessed.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that you can add a model server to.
+ifndef::upstream[]
+* If you want to use a custom model-serving runtime for your model server, you have added and enabled the runtime. See link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#adding-a-custom-model-serving-runtime_nb-server[Adding a custom model-serving runtime].
+* If you want to use graphics processing units (GPUs) with your model server, you have enabled GPU support in {productname-short}. See {rhodsdocshome}{default-format-url}/managing_users_and_user_resources/enabling-gpu-support-in-openshift-data-science_user-mgmt[Enabling GPU support in {productname-short}]
+endif::[]
+ifdef::upstream[]
+* If you want to use a custom model-serving runtime for your model server, you have added and enabled the runtime. See link:{odhdocshome}/working-on-data-science-projects/#adding-a-custom-model-serving-runtime_nb-server[Adding a custom model-serving runtime].
+* If you want to use graphics processing units (GPUs) with your model server, you have enabled GPU support. This includes installing the Node Feature Discovery and GPU Operators. For more information, see https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/openshift/contents.html[NVIDIA GPU Operator on OpenShift] in the NVIDIA documentation.
+endif::[]
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to configure a model server for.
++
+A project details page opens.
+. In the *Models and model servers* section, click *Add server*.
++
+The *Add model server* dialog opens.
+. In the *Model server name* field, enter a unique name for the model server.
+. From the *Serving runtime* list, select a model-serving runtime that is installed and enabled in your {productname-short} deployment.
+. In the *Number of model replicas to deploy* field, specify a value.
+. From the *Model server size* list, select one of the following server sizes:
+* Small
+* Medium
+* Large
+* Custom
+. Optional: If you selected *Custom* in the preceding step, configure the following settings in the *Model server size* section to customize your model server:
+.. In the *CPUs requested* field, specify a number of CPUs to use with your model server. Use the list beside this field to specify the value in cores or millicores.
+.. In the *CPU limit* field, specify the maximum number of CPUs to use with your model server. Use the list beside this field to specify the value in cores or millicores.
+.. In the *Memory requested* field, specify the requested memory for the model server in gibibytes (Gi).
+.. In the *Memory limit* field, specify the maximum memory limit for the model server in gibibytes (Gi).
+. Optional: In the *Model server GPUs* field, specify a number of GPUs to use with your model server.
++
+[IMPORTANT]
+====
+{productname-short} includes two versions of the OpenVINO Model Server (OVMS) runtime by default; a version that supports GPUs and one that does not. To use GPUs, from the *Serving runtime* list, you must select the version whose display name includes `Supports GPUs`.
+
+If you are using a _custom_ model-serving runtime with your model server, you must ensure that your custom runtime supports GPUs and is appropriately configured to use them.
+====
+
+. Optional: In the *Model route* section, select the *Make deployed models available through an external route* check box to make your deployed models available to external clients.
+. Optional: In the *Token authorization* section, select the *Require token authentication* check box to require token authentication for your model server. To finish configuring token authentication, perform the following actions:
+.. In the *Service account name* field, enter a service account name for which the token will be generated. The generated token is created and displayed in the *Token secret* field when the model server is configured.
+.. To add an additional service account, click *Add a service account* and enter another service account name.
+. Click *Add*.
+
+.Verification
+* The model server that you configured is displayed in the *Models and model servers* section of the project details page.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='configuring-a-pipeline-server_{context}']
+= Configuring a pipeline server
+
+[role='_abstract']
+Before you can successfully create a pipeline in {productname-short}, you must configure a pipeline server. This includes configuring where your pipeline artifacts and data are stored.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that you can add a pipeline server to.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to configure a pipeline server for.
++
+A project details page opens.
+. In the *Pipelines* section, click *Create a pipeline server*.
++
+The *Configure pipeline server* dialog appears.
+. In the *Object storage connection* section, to specify the S3-compatible data connection to store your pipeline artifacts, select one of the following sets of actions:
++
+[NOTE]
+====
+After the pipeline server is created, the `/metadata` and `/artifacts` folders are automatically created in the default `root` folder. Therefore, you are not required to specify any storage directories when configuring a data connection for your pipeline server.
+====
+* Select *Existing data connection* to use a data connection that you previously defined. If you selected this option, from the *Name* list, select the name of the relevant data connection and skip to step 6.
+* Select *Create new data connection* to add a new data connection that your pipeline server can access.
+. If you selected *Create new data connection*, perform the following steps:
+.. In the *Name* field, enter a name for the data connection.
+.. In the *AWS_ACCESS_KEY_ID* field, enter your access key ID for Amazon Web Services.
+.. In the *AWS_SECRET_ACCESS_KEY_ID* field, enter your secret access key for the account you specified.
+.. Optional: In the *AWS_S3_ENDPOINT* field, enter the endpoint of your AWS S3 storage.
+.. Optional: In the *AWS_DEFAULT_REGION* field, enter the default region of your AWS account.
+.. In the *AWS_S3_BUCKET* field, enter the name of the AWS S3 bucket.
++
+[IMPORTANT]
+====
+If you are creating a new data connection, in addition to the other designated mandatory fields, the *AWS_S3_BUCKET* field is mandatory. If you specify incorrect data connection settings, you cannot update these settings on the same pipeline server. Therefore, you must delete the pipeline server and configure another one.
+====
+. In the *Database* section, click *Show advanced database options* to specify the database to store your pipeline data and select one of the following sets of actions:
+* Select *Use default database stored on your cluster* to deploy a MariaDB database in your project.
+* Select *Connect to external MySQL database* to add a new connection to an external database that your pipeline server can access.
+... In the *Host* field, enter the database's host name.
+... In the *Port* field, enter the database's port.
+... In the *Username* field, enter the default user name that is connected to the database.
+... In the *Password* field, enter the password for the default user account.
+... In the *Database* field, enter the database name.
+. Click *Configure*.
+
+.Verification
+* The pipeline server that you configured is displayed in the *Pipelines* section on the project details page.
+* The *Import pipeline* button is available in the *Pipelines* section on the project details page.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="creating-a-data-science-project_{context}"]
+= Creating a data science project
+
+[role='_abstract']
+To start your data science work, create a data science project. Creating a project helps you organize your work in one place. You can also enhance the capabilities of your data science project by adding workbenches, adding storage to your project's cluster, adding data connections, and adding model servers.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click *Create data science project*.
++
+The *Create a data science project* dialog opens.
+. Enter a *name* for your data science project.
+. Optional: Edit the *resource name* for your data science project. The resource name must consist of lowercase alphanumeric characters, '-', and must start and end with an alphanumeric character.
+. Enter a *description* for your data science project.
+. Click *Create*.
++
+A project details page opens. From here, you can create workbenches, add cluster storage, and add data connections to your project.
+
+.Verification
+* The data science project that you created is displayed on the *Data science projects* page.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+//pv2hash: 9cbc09e0-cac2-4eb3-8f30-09e6469c5164
+
+[id='creating-a-new-notebook_{context}']
+= Creating a new notebook
+
+[role='_abstract']
+You can create a new Jupyter notebook from an existing notebook container image to access its resources and properties. The *Notebook server control panel* contains a list of available container images that you can run as a single-user notebook server.
+
+// Reference: https://docs.google.com/document/d/1TFszdhIkxXbb7Kc1OirASAlaBkmINYmTtdSyaoHIbZI/edit
+
+.Prerequisites
+* Ensure that you have logged in to {productname-long}.
+* Ensure that you have launched your notebook server and logged in to Jupyter.
+* The notebook image exists in a registry, image stream, and is accessible.
+
+.Procedure
+. Click *File* -> *New* -> *Notebook*.
+. If prompted, select a kernel for your notebook from the list.
++
+If you want to use a kernel, click *Select*. If you do not want to use a kernel, click *No Kernel*.
+
+.Verification
+* Check that the notebook file is visible in the JupyterLab interface.
+
+// [role="_additional-resources"]
+// .Additional resources
+// * TODO or delete
+:_module-type: PROCEDURE
+
+[id="creating-a-project-workbench_{context}"]
+= Creating a project workbench
+
+[role='_abstract']
+To examine and work with data models in an isolated area, you can create a workbench. This workbench enables you to create a new Jupyter notebook from an existing notebook container image to access its resources and properties. For data science projects that require data to be retained, you can add container storage to the workbench you are creating.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that you can add a workbench to.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to add the workbench to.
++
+The *Details* page for the project opens.
+. Click *Create workbench* in the *Workbenches* section.
++
+The *Create workbench* page opens.
+. Configure the properties of the workbench you are creating.
+.. Enter a *name* for your workbench.
+.. Enter a *description* for your workbench.
+.. Select the *notebook image* to use for your workbench server.
+.. Select the *container size* for your server.
+.. Optional: Select and specify values for any new *environment variables*.
+ifdef::upstream[]
++
+[NOTE]
+--
+To enable data science pipelines in JupyterLab, create the following environment variable:
+`PIPELINES_SSL_SA_CERTS=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
+--
+endif::[]
+ifdef::self-managed[]
++
+[NOTE]
+--
+To enable data science pipelines in JupyterLab in self-managed deployments, create the following environment variable:
+`PIPELINES_SSL_SA_CERTS=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`
+--
+endif::[]
+.. Configure the storage for your {productname-short} cluster.
+... Select *Create new persistent storage* to create storage that is retained after you log out of {productname-short}. Fill in the relevant fields to define the storage.
+... Select *Use existing persistent storage* to reuse existing storage then select the storage from the *Persistent storage* list.
+. Click *Create workbench*.
+
+.Verification
+* The workbench that you created appears on the *Details* page for the project.
+* Any cluster storage that you associated with the workbench during the creation process appears on the *Details* page for the project.
+* The *Status* column, located in the *Workbenches* section of the *Details* page, displays a status of *Starting* when the workbench server is starting, and *Running* when the workbench has successfully started.
+
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="creating-a-runtime-configuration_{context}"]
+= Creating a runtime configuration
+
+[role='_abstract']
+If you create a workbench as part of a data science project, a default runtime configuration is created automatically. However, if you create a notebook from the Jupyter tile in the {productname-short} dashboard, you must create a runtime configuration before you can run your pipeline in JupyterLab. This enables you to specify connectivity information for your pipeline instance and S3-compatible cloud storage.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have access to S3-compatible cloud storage.
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the left sidebar of JupyterLab, click *Runtimes* (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]).
+. Click the *Create new runtime configuration* button (image:images/jupyter-create-runtime.png[Create new runtime configuration]).
++
+The *Add new Data Science Pipelines runtime configuration* page opens.
+. Fill in the relevant fields to define your runtime configuration.
+.. In the *Display Name* field, enter a name for your runtime configuration.
+.. Optional: In the *Description* field, enter a description to define your runtime configuration.
+.. Optional: In the *Tags* field, click *Add Tag* to define a category for your pipeline instance. Enter a name for the tag and press Enter.
+.. Define the credentials of your data science pipeline:
+... In the *Data Science Pipelines API Endpoint* field, enter the API endpoint of your data science pipeline. Do not specify the pipelines namespace in this field.
+//+
+//[IMPORTANT]
+//====
+//To obtain the Data Science Pipelines API endpoint, x.
+//====
+... In the *Public Data Science Pipelines API Endpoint* field, enter the public API endpoint of your data science pipeline.
++
+[IMPORTANT]
+====
+You can obtain the Data Science Pipelines API endpoint from the *Data Science Pipelines* -> *Runs* page in the dashboard. Copy the relevant end point and enter it in the *Public Data Science Pipelines API Endpoint* field.
+====
+... Optional: In the *Data Science Pipelines User Namespace* field, enter the relevant user namespace to run pipelines.
+... From the *Data Science Pipelines engine* list, select `Tekton`.
+... From the *Authentication Type* list, select the authentication type required to authenticate your pipeline.
++
+[IMPORTANT]
+====
+If you created a notebook directly from the Jupyter tile on the dashboard, select `EXISTING_BEARER_TOKEN` from the *Authentication Type* list.
+====
+... In the *Data Science Pipelines API Endpoint Username* field, enter the user name required for the authentication type.
+... In the *Data Science Pipelines API Endpoint Password Or Token*, enter the password or token required for the authentication type.
++
+[IMPORTANT]
+====
+To obtain the Data Science Pipelines API endpoint token, in the upper-right corner of the OpenShift web console, click your user name and select *Copy login command*. After you have logged in, click *Display token* and copy the value of `--token=` from the *Log in with this token* command.
+====
+.. Define the connectivity information of your S3-compatible storage:
+... In the *Cloud Object Storage Endpoint* field, enter the endpoint of your S3-compatible storage. For more information about Amazon s3 endpoints, see link:https://docs.aws.amazon.com/general/latest/gr/s3.html[Amazon Simple Storage Service endpoints and quotas].
+... Optional: In the *Public Cloud Object Storage Endpoint* field, enter the URL of your S3-compatible storage.
+... In the *Cloud Object Storage Bucket Name* field, enter the name of the bucket where your pipeline artifacts are stored. If the bucket name does not exist, it is created automatically.
+... From the *Cloud Object Storage Authentication Type* list, select the authentication type required to access to your S3-compatible cloud storage. If you use AWS S3 buckets, select `KUBERNETES_SECRET` from the list.
+... In the *Cloud Object Storage Credentials Secret* field, enter the secret that contains the storage user name and password. This secret is defined in the relevant user namespace, if applicable. In addition, it must be stored on the cluster that hosts your pipeline runtime.
+... In the *Cloud Object Storage Username* field, enter the user name to connect to your S3-compatible cloud storage, if applicable. If you use AWS S3 buckets, enter your AWS Secret Access Key ID.
+... In the *Cloud Object Storage Password* field, enter the password to connect to your S3-compatible cloud storage, if applicable. If you use AWS S3 buckets, enter your AWS Secret Access Key.
+.. Click *Save & Close*.
+
+.Verification
+* The runtime configuration that you created is shown in the *Runtimes* tab (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]) in the left sidebar of JupyterLab.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: CONCEPT
+
+[id='defining-a-pipeline_{context}']
+= Defining a pipeline
+
+[role='_abstract']
+The Kubeflow Pipelines SDK enables you to define end-to-end machine learning and data pipelines. Use the Kubeflow Pipelines SDK to build your data science pipeline in Python code. After you have built your pipeline, compile it into Tekton-formatted YAML code using kfp-tekton SDK (version 1.5.x only). After defining the pipeline, you can import the YAML file to the {productname-short} dashboard to enable you to configure its execution settings. For more information about installing and using Kubeflow Pipelines SDK for Tetkon, see link:https://kubeflow.org/docs/components/pipelines/v1/sdk/pipelines-with-tekton/[Kubeflow Pipelines SDK for Tekton].
+
+ifdef::upstream[]
+You can also use the Elyra JupyterLab extension to create and run data science pipelines within JupyterLab. For more information on the Elyra JupyterLab extension, see link:https://elyra.readthedocs.io/en/stable/getting_started/overview.html[Elyra Documentation].
+endif::[]
+
+ifndef::upstream[]
+You can also use the Elyra JupyterLab extension to create and run data science pipelines within JupyterLab. For more information on creating pipelines in JupyterLab, see link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-with-data-science-pipelines_ds-pipelines#working-with-pipelines-in-jupyterlab[Working with pipelines in JupyterLab]. For more information on the Elyra JupyterLab extension, see link:https://elyra.readthedocs.io/en/stable/getting_started/overview.html[Elyra Documentation].
+endif::[]
+
+[role="_additional-resources"]
+.Additional resources
+* link:https://github.com/kubeflow/kfp-tekton/tree/master/sdk[Kubeflow Pipelines SDK for Tekton]
+* link:https://github.com/kubeflow/kfp-tekton/tree/master/samples[KFP Tekton samples and compiler samples]
+* link:https://www.kubeflow.org/docs/components/pipelines/v1/[Kubeflow Pipelines v1 Documentation]
+* link:https://elyra.readthedocs.io/en/stable/getting_started/overview.html[Elyra Documentation]
+:_module-type: PROCEDURE
+
+[id="deleting-a-data-connection_{context}"]
+= Deleting a data connection
+
+[role='_abstract']
+You can delete data connections from your data science projects to help you remove connections that are no longer relevant to your work.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project with a data connection.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to delete the data connection from.
++
+The *Details* page for the project opens.
+. Click the action menu (*&#8942;*) beside the data connection that you want to delete in the *Data connections* section and click *Delete data connection*.
++
+The *Delete data connection* dialog opens.
+. Enter the name of the data connection in the text field to confirm that you intend to delete it.
+. Click *Delete data connection*.
+
+.Verification
+* The data connection that you deleted is no longer displayed in the *Data connections* section on the project *Details* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-data-science-pipeline_{context}"]
+= Deleting a data science pipeline
+
+[role='_abstract']
+You can delete data science pipelines so that they do not appear on the {productname-short} *Pipelines* page.
+//+ - [Chris] - June 1st 2023: As of RHODS 1.27, the important note below is NOT true. So commenting out for now. Uncomment it out when it actually is true, or rewrite it at a future point in time so that it's accurate.
+//[IMPORTANT]
+//====
+//Deleting a data science pipeline deletes any associated artifacts and data connections. This data is permanently deleted and is not recoverable.
+//====
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* There are active pipelines available on the *Pipelines* page.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project that contains the pipeline that you want to delete.
+. Click the action menu (*&#8942;*) beside the pipeline that you want to delete and click *Delete pipeline*.
++
+The *Delete pipeline* dialog opens.
+. Enter the pipeline name in the text field to confirm that you intend to delete it.
+. Click *Delete pipeline*.
+
+.Verification
+* The data science pipeline that you deleted is no longer displayed on the *Pipelines* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-data-science-project_{context}"]
+= Deleting a data science project
+
+[role='_abstract']
+You can delete data science projects so that they do not appear on the {productname-short} *Data science projects* page when you no longer want to use them.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users`) in OpenShift.
+endif::[]
+* You have created a data science project.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the action menu (*&#8942;*) beside the project that you want to delete and click *Delete project*.
++
+The *Delete project* dialog opens.
+. Enter the project name in the text field to confirm that you intend to delete it.
+. Click *Delete project*.
+
+.Verification
+* The data science project that you deleted is no longer displayed on the *Data science projects* page.
+* Deleting a data science project deletes any associated workbenches, cluster storage, and data connections. This data is permanently deleted and is not recoverable.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-deployed-model_{context}"]
+= Deleting a deployed model
+
+[role='_abstract']
+You can delete models you have previously deployed. This enables you to remove deployed models that are no longer required.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users`) in OpenShift.
+endif::[]
+* You have deployed a model.
+
+.Procedure
+. From the {productname-short} dashboard, click *Model serving*.
++
+The *Model Serving* page opens.
+. Click the action menu (*&#8942;*) beside the deployed model that you want to delete and click *Delete*.
++
+The *Delete deployed model* dialog opens.
+. Enter the name of the deployed model in the text field to confirm that you intend to delete it.
+. Click *Delete deployed model*.
+
+.Verification
+* The model that you deleted is no longer displayed on the *Model Serving* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-model-server_{context}"]
+= Deleting a model server
+
+[role='_abstract']
+When you no longer need a model server to host models, you can remove it from your data science project. 
+
+NOTE: When you remove a model server, you also remove the models that are hosted on that model server. As a result, the models are no longer available to applications.
+
+.Prerequisites
+* You have created a data science project and an associated model server.
+* You have notified the users of the applications that access the models that the models will no longer be available.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project from which you want to delete the model server.
++
+A project details page opens.
+. Click the action menu (*&#8942;*) beside the project whose model server you want to delete in the *Models and model servers* section and then click *Delete model server*.
++
+The *Delete model server* dialog opens.
+. Enter the name of the model server in the text field to confirm that you intend to delete it.
+. Click *Delete model server*.
+
+.Verification
+* The model server that you deleted is no longer displayed in the *Models and model servers* section on the project details page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-pipeline-server_{context}"]
+= Deleting a pipeline server
+
+[role='_abstract']
+After you have finished running your data science pipelines, you can delete the pipeline server. Deleting a pipeline server automatically deletes all of its associated pipelines and runs. If your pipeline data is stored in a database, the database is also deleted along with its meta-data. In addition, after deleting a pipeline server, you cannot create new pipelines or pipeline runs until you create another pipeline server.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a pipeline server.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project whose pipeline server you want to delete.
+. From the *Pipeline server actions* list, select *Delete pipeline server*.
+The *Delete pipeline server* dialog opens.
+. Enter the pipeline server's name in the text field to confirm that you intend to delete it.
+. Click *Delete*.
+
+.Verification
+* Pipelines previously assigned to the deleted pipeline server are no longer displayed on the *Pipelines* page for the relevant data science project.
+* Pipeline runs previously assigned to the deleted pipeline server are no longer displayed on the *Runs* page for the relevant data science project.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-runtime-configuration_{context}"]
+= Deleting a runtime configuration
+
+[role='_abstract']
+After you have finished using your runtime configuration, you can delete it from the JupyterLab interface. After deleting a runtime configuration, you cannot run pipelines in JupyterLab until you create another runtime configuration.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* A previously created runtime configuration is visible in the JupyterLab interface.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the left sidebar of JupyterLab, click *Runtimes* (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]).
+. Hover the cursor over the runtime configuration that you want to delete and click the *Delete Item* button (image:images/jupyterlab-trash-button.png[Delete item]).
++
+A dialog box appears prompting you to confirm the deletion of your runtime configuration.
+. Click *OK*.
+
+.Verification
+* The runtime configuration that you deleted is no longer shown in the *Runtimes* tab (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]) in the left sidebar of JupyterLab.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id="deleting-a-scheduled-pipeline-run_{context}"]
+= Deleting a scheduled pipeline run
+
+[role='_abstract']
+To discard pipeline runs that you previously scheduled, but no longer require, you can delete them so that they do not appear on the *Runs* page.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+* You have imported a pipeline to an active pipeline server.
+* You have previously scheduled a run that is available to delete.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. From the *Project* list, select the project that contains the pipeline whose scheduled run you want to delete.
++
+The page refreshes to show the pipeline's scheduled runs on the *Scheduled* tab.
+. Click the action menu (*&#8942;*) beside the scheduled run that you want to delete and click *Delete*.
++
+The *Delete scheduled run* dialog opens.
+. Enter the run's name in the text field to confirm that you intend to delete it.
+. Click *Delete scheduled run*.
+
+.Verification
+* The run that you deleted is no longer displayed on the *Scheduled* tab.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-triggered-pipeline-run_{context}"]
+= Deleting a triggered pipeline run
+
+[role='_abstract']
+To discard pipeline runs that you previously executed, but no longer require a record of, you can delete them so that they do not appear on the *Triggered* tab on the *Runs* page.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+* You have imported a pipeline to an active pipeline server.
+* You have previously executed a run that is available to delete.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. From the *Project* list, select the project that contains the pipeline whose triggered run you want to delete.
++
+The page refreshes to show the pipeline's triggered runs on the *Triggered* tab.
+. Click the action menu (*&#8942;*) beside the triggered run that you want to delete and click *Delete*.
++
+The *Delete triggered run* dialog opens.
+. Enter the run's name in the text field to confirm that you intend to delete it.
+. Click *Delete triggered run*.
+
+.Verification
+* The run that you deleted is no longer displayed on the *Triggered* tab.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-a-workbench-from-a-data-science-project_{context}"]
+= Deleting a workbench from a data science project
+
+[role='_abstract']
+You can delete workbenches from your data science projects to help you remove Jupyter notebooks that are no longer relevant to your work.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project with a workbench.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to delete the workbench from.
++
+The *Details* page for the project opens.
+. Click the action menu (*&#8942;*) beside the workbench that you want to delete in the *Workbenches* section and click *Delete workbench*.
++
+The *Delete workbench* dialog opens.
+. Enter the name of the workbench in the text field to confirm that you intend to delete it.
+. Click *Delete workbench*.
+
+.Verification
+* The workbench that you deleted is no longer displayed in the *Workbenches* section on the project *Details* page.
+* The custom resource (CR) associated with the workbench's Jupyter notebook is deleted.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="deleting-cluster-storage-from-a-data-science-project_{context}"]
+= Deleting cluster storage from a data science project
+
+[role='_abstract']
+You can delete cluster storage from your data science projects to help you free up resources and delete unwanted storage space.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project with cluster storage.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to delete the storage from.
++
+A project details page opens.
+. In the *Cluster storage* section, click the action menu (*&#8942;*) beside the storage that you want to delete and then click *Delete storage*.
++
+The *Delete storage* dialog opens.
+. Enter the name of the storage in the text field to confirm that you intend to delete it.
+. Click *Delete storage*.
+
+.Verification
+* The storage that you deleted is no longer displayed in the *Cluster storage* section on the project *Details* page.
+* The persistent volume (PV) and persistent volume claim (PVC) associated with the cluster storage are both permanently deleted. This data is not recoverable.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='deploying-a-model_{context}']
+= Deploying a model in {productname-short}
+
+[role='_abstract']
+You can deploy trained models on {productname-short} to enable you to test and implement them into intelligent applications. Deploying a model makes it available as a service that you can access using an API. This enables you to return predictions based on data inputs. 
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users`) in OpenShift.
+endif::[]
+* You have created a data science project that contains an associated model server.
+* You know the folder path for the data connection that you want the model to access.
+
+.Procedure
+. From the {product-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project containing the model that you want to deploy.
++
+A project details opens.
+. In the *Models and model servers* section, next to the name of your model server, click *Deploy model*.
++
+The *Deploy model* dialog opens.
+. Configure properties for deploying your model as follows:
+.. In the *Model Name* field, enter a unique name for the model that you are deploying.
+.. From the *Model framework* list, select a framework for your model. 
++
+NOTE: The *Model framework* list shows only the frameworks that are supported by the model-serving runtime that you specified when you configured your model server.
+.. To specify the location of your model, perform one of the following sets of actions:
++
+--
+* *To use an existing data connection*
+... Select *Existing data connection*.
+... From the *Name* list, select a data connection that you previously defined.
+... In the *Folder path* field, enter the folder path that contains the model in your specified data source.
+
+* *To use a new data connection*
+... To define a new data connection that your model can access, select *New data connection*.
+... In the *Name* field, enter a unique name for the data connection.
+... In the *AWS_ACCESS_KEY_ID* field, enter your access key ID for Amazon Web Services (AWS).
+... In the *AWS_SECRET_ACCESS_KEY* field, enter your secret access key for the AWS account you specified.
+... In the *AWS_S3_ENDPOINT* field, enter the endpoint of your AWS S3 storage.
+... In the *AWS_DEFAULT_REGION* field, enter the default region of your AWS account.
+... In the *AWS_S3_BUCKET* field, enter the name of the AWS S3 bucket.
+... In the *Folder path* field, enter the folder path in your AWS S3 bucket that contains your data file. 
+--
+
+.. Click *Deploy*.
+
+.Verification
+* The model you deployed is displayed on the *Model Serving* page of the dashboard.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='disabling-applications_{context}']
+= Disabling applications connected to {productname-short}
+
+[role='_abstract']
+You can disable applications and components so that they do not appear on the {productname-short} dashboard when you no longer want to use them, for example, when data scientists no longer use an application or when the application's license expires.
+
+Disabling unused applications allows your data scientists to manually remove these application cards from their {productname-short} dashboard so that they can focus on the applications that they are most likely to use.
+ifndef::upstream[]
+See link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/disabling-applications_get-started#removing-disabled-applications_get-started[Removing disabled applications from {productname-short}] for more information about manually removing application cards.
+endif::[]
+
+[IMPORTANT]
+====
+Do not follow this procedure when disabling the following applications:
+
+* Anaconda Professional Edition. You cannot manually disable Anaconda Professional Edition. It is automatically disabled only when its license expires.
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+* Red Hat OpenShift API Management. You can only uninstall Red Hat OpenShift API Management from OpenShift Cluster Manager.
+endif::[]
+--
+endif::[]
+====
+
+.Prerequisites
+ifdef::upstream[]
+* You have logged in to the {productname-short} web console.
+* You are part of the `cluster-admins` user group in {openshift-platform}.
+* You have installed or configured the service on your {productname-short} cluster.
+* The application or component that you want to disable is enabled and appears on the *Enabled* page.
+endif::[]
+
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+* You have logged in to the {openshift-platform} web console.
+* You are part of the `cluster-admins` user group in {openshift-platform}.
+* You have installed or configured the service on your {openshift-platform} cluster.
+* The application or component that you want to disable is enabled and appears on the *Enabled* page.
+endif::[]
+ifdef::self-managed[]
+* You have logged in to the {openshift-platform} web console.
+* You are assigned the `cluster-admin` role  in {openshift-platform}.
+* You have installed or configured the service on your {openshift-platform} cluster.
+* The application or component that you want to disable is enabled and appears on the *Enabled* page.
+endif::[]
+--
+endif::[]
+
+.Procedure
+
+. In the {openshift-platform} web console, change into the *Administrator* perspective.
+ifndef::upstream[]
+. Change into the `redhat-ods-applications` project.
+endif::[]
+ifdef::upstream[]
+. Change into the `odh` project.
+endif::[]
+. Click *Operators* -> *Installed Operators*.
+. Click on the Operator that you want to uninstall. You can enter a keyword into the *Filter by name* field to help you find the Operator faster.
+. Delete any Operator resources or instances by using the tabs in the Operator interface.
++
+During installation, some Operators require the administrator to create resources or start process instances using tabs in the Operator interface. These must be deleted before the Operator can uninstall correctly.
+. On the *Operator Details* page, click the *Actions* drop-down menu and select *Uninstall Operator*.
++
+An *Uninstall Operator?* dialog box is displayed.
+. Select *Uninstall* to uninstall the Operator, Operator deployments, and pods. After this is complete, the Operator stops running and no longer receives updates.
+
+[IMPORTANT]
+====
+Removing an Operator does not remove any custom resource definitions or managed resources for the Operator. Custom resource definitions and managed resources still exist and must be cleaned up manually. Any applications deployed by your Operator and any configured off-cluster resources continue to run and must be cleaned up manually.
+====
+
+.Verification
+* The Operator is uninstalled from its target clusters.
+* The Operator no longer appears on the *Installed Operators* page.
+* The disabled application is no longer available for your data scientists to use, and is marked as `Disabled` on the *Enabled* page of the {productname-short} dashboard. This action may take a few minutes to occur following the removal of the Operator.
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: PROCEDURE
+
+[id="downloading-a-data-science-pipeline_{context}"]
+= Downloading a data science pipeline
+
+[role='_abstract']
+To make further changes to a data science pipeline that you previously uploaded to {productname-short}, you can download the pipeline's code from the user interface.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+* You have created and imported a pipeline to an active pipeline server that is available to download.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project whose pipeline that you want to download.
+. In the *Pipeline name* column, click the name of the pipeline that you want to download.
++
+The *Pipeline details* page opens displaying the *Graph* tab.
+. Click the *YAML* tab.
++
+The page reloads to display an embedded YAML editor showing the pipeline code.
+. Click the *Download* button (image:images/rhods-download-icon.png[]) to download the YAML file containing your pipeline's code to your local machine.
+
+.Verification
+* The pipeline code is downloaded to your browser's default directory for downloaded files.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id="duplicating-a-runtime-configuration_{context}"]
+= Duplicating a runtime configuration
+
+[role='_abstract']
+To prevent you from re-creating runtime configurations with similar values in their entirety, you can duplicate an existing runtime configuration in the JupyterLab interface.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* A previously created runtime configuration is visible in the JupyterLab interface.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the left sidebar of JupyterLab, click *Runtimes* (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]).
+. Hover the cursor over the runtime configuration that you want to duplicate and click the *Duplicate* button (image:images/jupyterlab-duplicate.png[Duplicate]).
+
+.Verification
+* The runtime configuration that you duplicated is shown in the *Runtimes* tab (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]) in the left sidebar of JupyterLab.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id='enabling-services_{context}']
+= Enabling services connected to {productname-short}
+
+[role='_abstract']
+You must enable SaaS-based services, such as Anaconda Professional Edition, before using them with {productname-long}. On-cluster services are enabled automatically.
+
+Typically, you can install services, or enable services connected to {productname-short} using one of the following methods:
+
+* Enabling the service from the *Explore* page on the {productname-short} dashboard, as documented in the following procedure.
+* Installing the Operator for the service from OperatorHub. OperatorHub is a web console for cluster administrators to discover and select Operators to install on their cluster. It is deployed by default in OpenShift Container Platform (link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.13/html/operators/administrator-tasks#olm-installing-from-operatorhub-using-web-console_olm-adding-operators-to-a-cluster[Installing from OperatorHub using the web console]).
++
+ifndef::upstream[]
+[NOTE]
+====
+Deployments containing Operators installed from OperatorHub may not be fully supported by Red Hat.
+====
+endif::[]
+* Installing the Operator for the service from Red Hat Marketplace (link:https://marketplace.redhat.com/en-us/documentation/operators[Install Operators]).
+* Installing the service as an {install-package} to your {openshift-platform} cluster (link:https://docs.openshift.com/container-platform/4.13/operators/admin/olm-adding-operators-to-cluster.html[Adding Operators to a cluster]).
+
+For some services (such as Jupyter), the service endpoint is available on the tile for the service on the *Enabled* page of {productname-short}. Certain services cannot be accessed directly from their tiles, for example, OpenVINO and Anaconda provide notebook images for use in Jupyter and do not provide an endpoint link from their tile. Additionally, it may be useful to store these endpoint URLs as environment variables for easy reference in a notebook environment.
+
+ifdef::managed[]
+Some independent software vendor (ISV) applications must be installed in specific {productname-short} Add-on namespaces. However, do not install ISV applications in namespaces associated with {productname-short} Add-ons unless you are specifically directed to do so on the application’s card on the dashboard.
+endif::[]
+
+ifdef::self-managed[]
+Some independent software vendor (ISV) applications must be installed in specific {productname-short} Operator namespaces. However, do not install ISV applications in namespaces associated with {productname-short} Operators unless you are specifically directed to do so on the card for the application’s card on the dashboard.
+endif::[]
+
+ifdef::upstream[]
+Some independent software vendor (ISV) applications must be installed in specific {productname-short} Operator namespaces. However, do not install ISV applications in namespaces associated with {productname-short} Operators unless you are specifically directed to do so on the application’s card on the dashboard.
+endif::[]
+
+To help you get started quickly, you can access the service's learning resources and documentation on the **Resources** page, or by clicking the relevant link on the tile for the service on the **Enabled** page.
+
+.Prerequisites
+* You have logged in to {productname-short}.
+* Your administrator has installed or configured the service on your OpenShift cluster.
+
+.Procedure
+. On the {productname-short} home page, click *Explore*.
++
+The *Explore* page opens.
+
+. Click the card of the service that you want to enable.
+. Click *Enable* on the drawer for the service.
+. If prompted, enter the service's key and click *Connect*.
+. Click *Enable* to confirm that you are enabling the service.
+
+.Verification
+* The service that you enabled appears on the *Enabled* page.
+* The service endpoint is displayed on the tile for the service on the *Enabled* page.
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: PROCEDURE
+
+[id="exporting-a-pipeline-in-jupyterlab_{context}"]
+= Exporting a pipeline in JupyterLab
+
+[role='_abstract']
+You can export pipelines that you have created in JupyterLab. When you export a pipeline, the pipeline is prepared for later execution, but is not uploaded or executed immediately. During the export process, any package dependencies are uploaded to S3-compatible storage. Also, pipeline code is generated for the target runtime.
+
+Before you can export a pipeline, you must create a data science project and a pipeline server. After you create a pipeline server, you must create a workbench within the same project as your pipeline server. In addition, your pipeline instance in JupyterLab must contain a runtime configuration. If you create a workbench as part of a data science project, a default runtime configuration is created automatically. However, if you create a notebook from the Jupyter tile in the {productname-short} dashboard, you must create a runtime configuration before you can export your pipeline in JupyterLab. A runtime configuration defines connectivity information for your pipeline instance and S3-compatible cloud storage.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* You have access to S3-compatible storage.
+* You have a created a pipeline in JupyterLab.
+* You have opened your pipeline in the Pipeline Editor in JupyterLab.
+* Your pipeline instance contains a runtime configuration.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the Pipeline Editor user interface, click *Export Pipeline* (image:images/jupyterlab-export-pipeline-button.png[Export pipeline]).
++
+The *Export Pipeline* dialog appears. The *Pipeline Name* field is automatically populated with the pipeline file name.
+. Define the settings to export your pipeline.
+.. From the *Runtime Configuration* list, select the relevant runtime configuration to export your pipeline.
+.. From the *Export Pipeline as* select an appropriate file format
+.. In the *Export Filename* field, enter a file name for the exported pipeline.
+.. Select the *Replace if file already exists* check box to replace an existing file of the same name as the pipeline you are exporting.
+.. Optional: Configure your pipeline parameters, if applicable. If your pipeline contains nodes that reference pipeline parameters, you can change the default parameter values. If a parameter is required and has no default value, you must enter a value.
+. Click *OK*.
+
+.Verification
+* You can view the file containing the pipeline that you exported in your designated object storage bucket.
+
+
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id="importing-a-data-science-pipeline_{context}"]
+= Importing a data science pipeline
+
+[role='_abstract']
+To help you begin working with data science pipelines in {productname-short}, you can import a YAML file containing your pipeline's code to an active pipeline server. This file contains a Kubeflow pipeline compiled with the Tekton compiler. After you have imported the pipeline to a pipeline server, you can execute the pipeline by creating a pipeline run.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project that you want to import a pipeline to.
+. Click *Import pipeline*.
++
+The *Import pipeline* dialog opens.
+. Enter the details for the pipeline that you are importing.
+.. In the *Pipeline name* field, enter a name for the pipeline that you are importing.
+.. In the *Pipeline description* field, enter a description for the pipeline that you are importing.
+.. Click *Upload*. Alternatively, drag the file from your local machine's file system and drop it in the designated area in the *Import pipeline* dialog.
++
+A file browser opens.
+.. Navigate to the file containing the pipeline code and click *Select*.
+.. Click *Import pipeline*.
+
+.Verification
+* The pipeline that you imported is displayed on the *Pipelines* page.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+//pv2hash: 4a923821-c33f-445d-9b8a-00be6e4e49a5
+
+// ifeval::[{context} == appdeploy]
+// [id="updating-application-requirements_{context}"]
+// = Updating application requirements
+// endif::[]
+
+// ifeval::[{context} == rhods]
+[id="installing-python-packages-on-your-notebook-server_{context}"]
+= Installing Python packages on your notebook server
+// endif::[]
+
+[role='_abstract']
+You can install Python packages that are not part of the default notebook server image by adding the package and the version to a `requirements.txt` file and then running the `pip install` command in a notebook cell.
+
+ifndef::upstream[]
+NOTE: You can also install packages directly, but Red Hat recommends using a `requirements.txt` file so that the packages stated in the file can be easily re-used across different notebooks. In addition, using a `requirements.txt` file is also useful when using a S2I build to deploy a model.
+endif::[]
+ifdef::upstream[]
+NOTE: You can also install packages directly, but using a `requirements.txt` file so that the packages stated in the file can be easily re-used across different notebooks is recommended. In addition, using a `requirements.txt` file is also useful when using a S2I build to deploy a model.
+endif::[]
+
+.Prerequisites
+* Log in to Jupyter and open a notebook.
+
+.Procedure
+. Create a new text file using one of the following methods:
+** Click *+* to open a new launcher and click *Text file*.
+** Click *File* -> *New* -> *Text File*.
+. Rename the text file to `requirements.txt`.
+.. Right-click on the name of the file and click *Rename Text*. The *Rename File* dialog opens.
+.. Enter `requirements.txt` in the *New Name* field and click *Rename*.
+. Add the packages to install to the `requirements.txt` file.
++
+[source]
+----
+altair
+----
++
+You can specify the exact version to install by using the `==` (equal to) operator, for example:
++
+[source]
+----
+altair==4.1.0
+----
++
+ifndef::upstream[]
+[NOTE]
+====
+Red Hat recommends specifying exact package versions to enhance the stability of your notebook server over time. New package versions can introduce undesirable or unexpected changes in your environment's behavior.
+====
+endif::[]
+ifdef::upstream[]
+Specifying exact package versions to enhance the stability of your notebook server over time is recommended. New package versions can introduce undesirable or unexpected changes in your environment's behavior. 
+endif::[]
+To install multiple packages at the same time, place each package on a separate line.
+. Install the packages in `requirements.txt` to your server using a notebook cell.
+.. Create a new cell in your notebook and enter the following command:
++
+[source]
+----
+!pip install -r requirements.txt
+----
+.. Run the cell by pressing Shift and Enter.
+
++
+[IMPORTANT]
+====
+This command installs the package on your notebook server, but you must still run the `import` directive in a code cell to use the package in your code.
+
+----
+import altair
+----
+====
+
+.Verification
+* Confirm that the packages in `requirements.txt` appear in the list of packages installed on the notebook server. 
+ifndef::upstream[]
+See link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#viewing-python-packages-installed-on-your-notebook-server_nb-server[Viewing Python packages installed on your notebook server] for details.
+endif::[]
+ifdef::upstream[]
+See link:{odhdocshome}/working-on-data-science-projects#viewing-python-packages-installed-on-your-notebook-server_nb-server[Viewing Python packages installed on your notebook server] for details.
+endif::[]
+:_module-type: PROCEDURE
+
+[id='launching-jupyter-and-starting-a-notebook-server_{context}']
+= Launching Jupyter and starting a notebook server
+
+[role='_abstract']
+Launch Jupyter and start a notebook server to start working with your notebooks.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+* You know the names and values you want to use for any environment variables in your notebook server environment, for example, `AWS_SECRET_ACCESS_KEY`.
+* If you want to work with a very large data set, work with your administrator to proactively increase the storage capacity of your notebook server.
+
+.Procedure
+
+. Locate the *Jupyter* card on the *Enabled applications* page.
+
+. Click *Launch application*.
++
+If you see an *Access permission needed* message, you are not in the default user group or the default administrator group for {productname-short}.
+ifndef::upstream[]
+Contact your administrator so that they can add you to the correct group using link:{rhodsdocshome}{default-format-url}/managing_users_and_user_resources/adding-users-for-openshift-data-science_useradd[Adding users for {productname-short}].
+endif::[]
+ifdef::upstream[]
+Contact your administrator so that they can add you to the correct group.
+endif::[]
++
+If you have not previously authorized the `jupyter-nb-<username>` service account to access your account, the *Authorize Access* page appears prompting you to provide authorization. Inspect the permissions selected by default, and click the *Allow selected permissions* button.
++
+If you credentials are accepted, the *Notebook server control panel* opens displaying the *Start a notebook server* page.
+. Start a notebook server.
++
+This is not required if you have previously opened Jupyter.
+
+.. Select the *Notebook image* to use for your server.
+.. If the notebook image contains multiple versions, select the version of the notebook image from the *Versions* section.
++
+[NOTE]
+--
+When a new version of a notebook image is released, the previous version remains available and supported on the cluster. This gives you time to migrate your work to the latest version of the notebook image.
+--
+.. Select the *Container size* for your server.
+.. Optional: Select the *Number of GPUs* (graphics processing units) for your server.
++
+[IMPORTANT]
+--
+ifdef::upstream[]
+Using GPUs to accelerate workloads is only supported with the PyTorch, TensorFlow, and CUDA notebook server images. In addition, you can specify the number of GPUs required for your notebook server only if GPUs are enabled on your cluster.
+endif::[]
+ifndef::upstream[]
+Using GPUs to accelerate workloads is only supported with the PyTorch, TensorFlow, and CUDA notebook server images. In addition, you can specify the number of GPUs required for your notebook server only if GPUs are enabled on your cluster. To learn how to enable GPU support, see link:{rhodsdocshome}{default-format-url}/managing_users_and_user_resources/enabling-gpu-support-in-openshift-data-science_user-mgmt[Enabling GPU support in {productname-short}].
+endif::[]
+--
+.. Optional: Select and specify values for any new *Environment variables*.
++
+The interface stores these variables so that you only need to enter them once. Example variable names for common environment variables are automatically provided for frequently integrated environments and frameworks, such as Amazon Web Services (AWS).
++
+[IMPORTANT]
+====
+Ensure that you select the *Secret* checkbox for any variables with sensitive values that must be kept private, such as passwords.
+====
+.. Optional: Select the *Start server in current tab* checkbox if necessary.
+.. Click *Start server*.
++
+The *Starting server* progress indicator appears. Click *Expand event log* to view additional information about the server creation process. Depending on the deployment size and resources you requested, starting the server can take up to several minutes. Click *Cancel* to cancel the server creation.
++
+After the server starts, you see one of the following behaviors:
++
+--
+* If you previously selected the *Start server in current tab* checkbox, the JupyterLab interface opens in the current tab of your web browser.
+* If you did not previously select the *Start server in current tab* checkbox, the *Starting server* dialog box prompts you to open the server in a new browser tab or in the current tab.
++
+The JupyterLab interface opens according to your selection.
+--
+
+.Verification
+* The JupyterLab interface opens.
+
+[role="_additional-resources"]
+.Additional resources
+ifndef::upstream[]
+link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments].
+endif::[]
+
+.Troubleshooting
+* If you see the "Unable to load notebook server configuration options" error message, contact your administrator so that they can review the logs associated with your Jupyter pod and determine further details about the problem.
+:_module-type: PROCEDURE
+
+[id='logging-in_{context}']
+= Logging in to {productname-short}
+
+[role='_abstract']
+Log in to {productname-short} from a browser for easy access to Jupyter and your data science projects.
+
+.Procedure
+. Browse to the {productname-short} instance URL and click *Log in with OpenShift*.
+ifdef::upstream[]
+** If you are a data scientist user, your administrator must provide you with the {productname-short} instance URL, for example, `https:://odh-dashboard-odh.apps.ocp4.example.com`.
+endif::[]
+ifndef::upstream[]
+** If you are a data scientist user, your administrator must provide you with the {productname-short} instance URL, for example, `https://rhods-dashboard-redhat-ods-applications.apps.example.abc1.p1.openshiftapps.com/`
+endif::[]
+** If you have access to {openshift-platform}, you can browse to the {openshift-platform} web console and click the *Application Launcher* (image:images/osd-app-launcher.png[The application launcher]) -> *{productname-long}*.
+
+. Click the name of your identity provider, for example, `GitHub`.
+. Enter your credentials and click *Log in* (or equivalent for your identity provider).
+
+.Verification
+* {productname-short} opens on the *Enabled applications* page.
+
+.Troubleshooting
+* If you see `An authentication error occurred` or `Could not create user` when you try to log in:
+** You might have entered your credentials incorrectly. Confirm that your credentials are correct.
+** You might have an account in more than one configured identity provider. If you have logged in with a different identity provider previously, try again with that identity provider.
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#launching-jupyter-and-starting-a-notebook-server_get-started[Launching Jupyter and starting a notebook server]
+endif::[]
+:_module-type: REFERENCE
+//pv2hash: 3882aee9-15c2-4bb8-963b-7a6918f849a6
+
+[id='notebook-images-for-data-scientists_{context}']
+= Notebook images for data scientists
+
+[role='_abstract']
+{productname-long} contains Jupyter notebook images optimized with industry-leading tools and libraries required for your data science work. To provide a consistent, stable platform for your model development, all notebook images contain the same version of Python. Notebook images available on {productname-long} are pre-built and ready for you to use immediately after {productname-short} is installed or upgraded. 
+
+ifdef::upstream[]
+Notebook images are upgraded quarterly to ensure that you are working with the latest supported version.
+endif::[]
+
+ifndef::upstream[]
+Notebook images are supported for a minimum of one year. Major updates to pre-configured notebook images occur approximately every six months. Therefore, two supported notebook images are typically available at any given time. You can use this support period to update your code to use components from the latest available notebook image.
+
+If necessary, you can still access older notebook images from the registry, even if they are no longer supported. You can then add the older notebook images as custom notebook images to cater for your project's specific requirements.
+endif::[]
+
+ifdef::managed[]
+See the table in link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments] for a complete list of packages and versions included in these images.
+endif::[]
+ifdef::self-managed[]
+See the table in link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments] for a complete list of packages and versions included in these images.
+endif::[]
+
+{productname-long} contains the following notebook images that are installed by default:
+
+.Default notebook images
+[cols="1,5"]
+|===
+| Image name | Description
+
+| CUDA
+| If you are working with compute-intensive data science models that require GPU support, use the Compute Unified Device Architecture (CUDA) notebook image to gain access to the NVIDIA CUDA Toolkit. Using this toolkit, you can optimize your work using GPU-accelerated libraries and optimization tools.
+
+| Standard Data Science
+| Use the Standard Data Science notebook image for models that do not require TensorFlow or PyTorch. This image contains commonly used libraries to assist you in developing your machine learning models.
+// RHODS-1598 - or CUDA or GPU support
+
+| TensorFlow
+| TensorFlow is an open source platform for machine learning. With TensorFlow, you can build, train and deploy your machine learning models. TensorFlow contains advanced data visualization features, such as computational graph visualizations. It also allows you to easily monitor and track the progress of your models.
+
+| PyTorch
+| PyTorch is an open source machine learning library optimized for deep learning. If you are working with computer vision or natural language processing models, use the Pytorch notebook image.
+// RHODS-1598 -  using GPUs and CPUs
+
+| Minimal Python
+| If you do not require advanced machine learning features, or additional resources for compute-intensive data science work, you can use the Minimal Python image to develop your models.
+
+| TrustyAI
+| Use the TrustyAI notebook image to leverage your data science work with model explainability, tracing and accountability, and runtime monitoring.
+
+|===
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#installing-python-packages-on-your-notebook-server_nb-server[Installing Python packages on your notebook server]
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments]
+endif::[]
+:_module-type: CONCEPT
+
+[id="notifications_{context}"]
+= Notifications in {productname-short}
+
+[role='_abstract']
+{productname-long} displays notifications when important events happen in the cluster.
+
+Notification messages are displayed in the lower left corner of the {productname-long} interface when they are triggered.
+
+If you miss a notification message, click the *Notifications* button (image:images/rhods-notifications-icon.png[Notifications icon]) to open the *Notifications* drawer and view unread messages.
+
+.The Notifications drawer
+ifdef::upstream[]
+image::images/odh-notifications-drawer.png[The {productname-short} interface with the Notifications drawer visible]
+endif::[]
+ifndef::upstream[]
+image::images/rhods-notifications-drawer.png[The {productname-short} interface with the Notifications drawer visible]
+endif::[]
+
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: REFERENCE
+
+[id='options-for-notebook-server-environments_{context}']
+= Options for notebook server environments
+
+[role='_abstract']
+When you start Jupyter for the first time, or after stopping your notebook server, you must select server options in the *Start a notebook server* wizard so that the software and variables that you expect are available on your server. This section explains the options available in the *Start a notebook server* wizard in detail.
+
+The *Start a notebook server* page is divided into several sections:
+
+Notebook image:: Specifies the container image that your notebook server is based on. Different notebook images have different packages installed by default. If the notebook image contains multiple versions, you can select the notebook image version to use from the *Versions* section.
++
+ifdef::upstream[]
+[NOTE]
+--
+When a new version of a notebook image is released, the previous version remains available and supported on the cluster. This gives you time to migrate your work to the latest version of the notebook image.
+--
+endif::[]
+ifndef::upstream[]
+[NOTE]
+--
+Notebook images are supported for a minimum of one year. Major updates to pre-configured notebook images occur approximately every six months. Therefore, two supported notebook images are typically available at any given time. To use the latest package versions, Red Hat recommends that you use the most recently added notebook image.
+--
+endif::[]
++
+After you start a notebook image, you can check which Python packages are installed on your notebook server and which version of the package you have by running the `pip` tool in a notebook cell.
++
+The following table shows the package versions used in the available notebook images:
++
+.Notebook image options
+|===
+| Image name | Image version | Preinstalled packages
+
+.2+| CUDA
+| 2 (Recommended)
+a| * Python 3.9
+* CUDA 11.8
+* JupyterLab 3.5
+* Notebook 6.5
+
+| 1
+a| * Python 3.8
+* CUDA 11.4
+* JupyterLab 3.2
+* Notebook 6.4
+
+.2+| Minimal Python (default)
+| 2 (Recommended)
+a| * Python 3.9
+* JupyterLab 3.5
+* Notebook 6.5
+
+| 1
+a| * Python 3.8
+* JupyterLab 3.2
+* Notebook 6.4
+
+
+.2+| PyTorch
+| 2 (Recommended)
+a| * Python 3.9
+* JupyterLab 3.5
+* Notebook 6.5
+* PyTorch 1.13
+* CUDA 11.7
+* TensorBoard 2.11
+* Boto3 1.26
+* Kafka-Python 2.0
+* Matplotlib 3.6
+* Numpy 1.24
+* Pandas 1.5
+* Scikit-learn 1.2
+* SciPy 1.10
+
+| 1
+a| * Python 3.8
+* JupyterLab 3.2
+* Notebook 6.4
+* PyTorch 1.8
+* CUDA 10.2
+* TensorBoard 2.6
+* Boto3 1.17
+* Kafka-Python 2.0
+* Matplotlib 3.4
+* Numpy 1.19
+* Pandas 1.2
+* Scikit-learn 0.24
+* SciPy 1.6
+
+.2+| Standard Data Science
+| 2 (Recommended)
+a| * Python 3.9
+* JupyterLab 3.5
+* Notebook 6.5
+* Boto3 1.26
+* Kafka-Python 2.0
+* Matplotlib 3.6
+* Pandas 1.5
+* Numpy 1.24
+* Scikit-learn 1.2
+* SciPy 1.10
+
+| 1
+a| * Python 3.8
+* JupyterLab 3.2
+* Notebook 6.4
+* Boto3 1.17
+* Kafka-Python 2.0
+* Matplotlib 3.4
+* Pandas 1.2
+* Numpy 1.19
+* Scikit-learn 0.24
+* SciPy 1.6
+
+.2+| TensorFlow
+| 2 (Recommended)
+a| * Python 3.9
+* JupyterLab 3.5
+* Notebook 6.5
+* TensorFlow 2.11
+* TensorBoard 2.11
+* CUDA 11.8
+* Boto3 1.26
+* Kafka-Python 2.0
+* Matplotlib 3.6
+* Numpy 1.24
+* Pandas 1.5
+* Scikit-learn 1.2
+* SciPy 1.10
+
+| 1
+a| * Python 3.8
+* JupyterLab 3.2
+* Notebook 6.4
+* TensorFlow 2.7
+* TensorBoard 2.6
+* CUDA 11.4
+* Boto3 1.17
+* Kafka-Python 2.0
+* Matplotlib 3.4
+* Numpy 1.19
+* Pandas 1.2
+* Scikit-learn 0.24
+* SciPy 1.6
+
+| TrustyAI
+| 1
+a| * Python 3.9
+* JupyterLab 3.5
+* Notebook 6.5
+* TrustyAI 0.2
+* Boto3 1.26
+* Kafka-Python 2.0
+* Matplotlib 3.6
+* Numpy 1.24
+* Pandas 1.5
+* Scikit-learn 1.2
+* SciPy 1.10
+
+|===
+
+Deployment size:: Specifies the compute resources available on your notebook server.
++
+*Container size* controls the number of CPUs, the amount of memory, and the minimum and maximum request capacity of the container.
++
+*Number of GPUs* specifies the number of graphics processing units attached to the container.
++
+[IMPORTANT]
+--
+ifdef::upstream[]
+Using GPUs to accelerate workloads is only supported with the PyTorch, TensorFlow, and CUDA notebook server images. In addition, you can specify the number of GPUs required for your notebook server only if GPUs are enabled on your cluster.
+endif::[]
+ifndef::upstream[]
+Using GPUs to accelerate workloads is only supported with the PyTorch, TensorFlow, and CUDA notebook server images. In addition, you can specify the number of GPUs required for your notebook server only if GPUs are enabled on your cluster. To learn how to enable GPU support, see link:{rhodsdocshome}{default-format-url}/managing_users_and_user_resources/enabling-gpu-support-in-openshift-data-science_user-mgmt[Enabling GPU support in {productname-short}].
+endif::[]
+--
+
+Environment variables:: Specifies the name and value of variables to be set on the notebook server. Setting environment variables during server startup means that you do not need to define them in the body of your notebooks, or with the Jupyter command line interface. Some recommended environment variables are shown in the table.
++
+.Recommended environment variables
+[cols="1,4",header]
+|===
+| Environment variable option | Recommended variable names
+
+| AWS
+a| * `AWS_ACCESS_KEY_ID` specifies your Access Key ID for Amazon Web Services.
+* `AWS_SECRET_ACCESS_KEY` specifies your Secret access key for the account specified in `AWS_ACCESS_KEY_ID`.
+
+|===
+
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#launching-jupyter-and-starting-a-notebook-server_get-started[Launching Jupyter and starting a notebook server]
+endif::[]
+:_module-type: CONCEPT
+
+[id='overview-of-pipeline-runs_{context}']
+= Overview of pipeline runs
+
+[role='_abstract']
+A pipeline run is a single execution of a data science pipeline. As data scientist, you can use {productname-short} to define, manage, and track executions of a data science pipeline. You can view a record of your data science project's previously executed and scheduled runs from the *Runs* page in the {productname-short} user interface.
+
+Runs are intended for portability. Therefore, you can clone your pipeline runs to reproduce and scale them accordingly, or delete them when you longer require them. You can configure a run to execute only once immediately after creation or on a recurring basis. Recurring runs consist of a copy of a pipeline with all of its parameter values and a run trigger. A run trigger indicates when a recurring run executes. You can define the following run triggers:
+
+* Periodic: used for scheduling runs to execute in intervals.
+* Cron: used for scheduling runs as a cron job.
+
+When executed, you can track the run's progress from the run's *Details* page on the {productname-short} user interface. From here, you can view the run's graph, and output artifacts.
+
+A pipeline run can be classified as the following: 
+
+* Scheduled run: A pipeline run scheduled to execute at least once
+* Triggered run: A previously executed pipeline run.
+
+
+//[role="_additional-resources"]
+//.Additional resources
+//*
+:_module-type: CONCEPT
+
+[id='overview-of-pipelines-in-jupyterlab_{context}']
+= Overview of pipelines in JupyterLab
+
+[role='_abstract']
+You can use Elyra to create visual end-to-end pipeline workflows in JupyterLab. Elyra is an extension for JupyterLab that provides you with a Pipeline Editor to create pipeline workflows that can be executed in {productname-short}.
+
+ifdef::upstream[]
+Before you can work with pipelines in JupyterLab, you must install the Data Science Pipelines operator as described in link:https://github.com/opendatahub-io/data-science-pipelines-operator[Data Science Pipelines Operator].
+endif::[]
+ifndef::upstream[]
+Before you can work with pipelines in JupyterLab, you must install the OpenShift Pipelines operator. For more information about installing a compatible version of the OpenShift Pipelines operator, see link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.13/html/cicd/pipelines#op-release-notes[Red Hat OpenShift Pipelines release notes] and link:https://access.redhat.com/articles/6986416[Red Hat Openshift Data Science: Supported Configurations].
+endif::[]
+
+You can access the Elyra extension within JupyterLab when you create the most recent version of one of the following notebook images:
+
+* Standard Data Science
+* PyTorch
+* TensorFlow
+* TrustyAI
+
+As you can use the Pipeline Editor to visually design your pipelines, minimal coding is required to create and run pipelines. For more information about Elyra, see link:https://elyra.readthedocs.io/en/stable/getting_started/overview.html[Elyra Documentation]. For more information on the Pipeline Editor, see link:https://elyra.readthedocs.io/en/stable/user_guide/jupyterlab-interface.html#visual-pipeline-editor[Visual Pipeline Editor]. After you have created your pipeline, you can run it locally in JupyterLab, or remotely using data science pipelines in {productname-short}.
+
+The pipeline creation process consists of the following tasks:
+
+* Create a data science project that contains a workbench.
+* Create a pipeline server.
+* Create a new pipeline in the Pipeline Editor in JupyterLab.
+* Develop your pipeline by adding Python notebooks or Python scripts and defining their runtime properties.
+* Define execution dependencies.
+* Run or export your pipeline.
+
+Before you can run a pipeline in JupyterLab, your pipeline instance must contain a runtime configuration. A runtime configuration defines connectivity information for your pipeline instance and S3-compatible cloud storage.
+
+If you create a workbench as part of a data science project, a default runtime configuration is created automatically. However, if you create a notebook from the Jupyter tile in the {productname-short} dashboard, you must create a runtime configuration before you can run your pipeline in JupyterLab. For more information about runtime configurations, see link:https://elyra.readthedocs.io/en/stable/user_guide/runtime-conf.html[Runtime Configuration]. As a prerequisite, before you create a workbench, ensure that you have created and configured a pipeline server within the same data science project as your workbench.
+
+You can use S3-compatible cloud storage to make data available to your notebooks and scripts while they are executed. Your cloud storage must be accessible from the machine in your deployment that runs JupyterLab and from the cluster that hosts Data Science Pipelines. Before you create and run pipelines in JupyterLab, ensure that you have your s3-compatible storage credentials readily available.
+
+[role="_additional-resources"]
+.Additional resources
+* link:https://elyra.readthedocs.io/en/stable/getting_started/overview.html[Elyra Documentation]
+* link:https://elyra.readthedocs.io/en/stable/user_guide/jupyterlab-interface.html#visual-pipeline-editor[Visual Pipeline Editor]
+* https://elyra.readthedocs.io/en/stable/user_guide/runtime-conf.html[Runtime Configuration].
+:_module-type: PROCEDURE
+//pv2hash: e1911f2a-33d2-45e0-ac1f-708e8d4d3aec
+
+[id='pushing-project-changes-to-a-git-repository_{context}']
+= Pushing project changes to a Git repository
+
+[role='_abstract']
+To build and deploy your application in a production environment, upload your work to a remote Git repository.
+
+.Prerequisites
+* You have opened a notebook in the JupyterLab interface.
+* You have already added the relevant Git repository to your notebook server.
+* You have permission to push changes to the relevant Git repository.
+* You have installed the Git version control extension.
+
+.Procedure
+. Click *File* -> *Save All* to save any unsaved changes.
+. Click the Git icon (image:images/jupyterlab-git-button.png[Git button]) to open the Git pane in the JupyterLab interface.
+. Confirm that your changed files appear under *Changed*.
++
+If your changed files appear under *Untracked*, click *Git* -> *Simple Staging* to enable a simplified Git process.
+. Commit your changes.
+.. Ensure that all files under *Changed* have a blue checkmark beside them.
+.. In the *Summary* field, enter a brief description of the changes you made.
+.. Click *Commit*.
+. Click *Git* -> *Push to Remote* to push your changes to the remote repository.
+. When prompted, enter your Git credentials and click *OK*.
+
+.Verification
+* Your most recently pushed changes are visible in the remote Git repository.
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: PROCEDURE
+
+[id='removing-access-to-a-data-science-project_{context}']
+= Removing access to a data science project
+
+[role='_abstract']
+If you no longer want to work collaboratively on your data science project, you can restrict access to your project by removing users and groups that you previously provided access to your project.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project.
+* You have previously shared access to your project with other users or groups.
+* You have administrator permissions or you are the project owner.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to change the access permissions of.
++
+A project details page opens.
+. Click the *Permissions* tab.
++
+The *Permissions* page for the project opens.
+. Click the action menu (*&#8942;*) beside the user or group whose access permissions you want to revoke and click *Delete*.
+
+.Verification
+* Users whose access you have revoked can no longer perform the actions that were permitted by their access permission level.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='removing-disabled-applications_{context}']
+= Removing disabled applications from {productname-short}
+
+[role='_abstract']
+
+After your administrator has disabled your unused applications, you can manually remove them from the {productname-long} dashboard. Disabling and removing unused applications allows you to focus on the applications that you are most likely to use.
+
+.Prerequisites
+* Ensure that you have logged in to {productname-long}.
+* You have logged in to the {openshift-platform} web console.
+* Your administrator has previously disabled the application that you want to remove.
+
+.Procedure
+. In the {productname-short} interface, click *Enabled*.
++
+The *Enabled* page opens. Disabled applications are denoted with `Disabled` on the card for the application.
+
+. Click *Disabled* on the card of the application that you want to remove.
+. Click the link to remove the application card.
+
+.Verification
+* The card for the disabled application no longer appears on the *Enabled* page.
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: PROCEDURE
+
+[id="running-a-pipeline-in-jupyterlab_{context}"]
+= Running a pipeline in JupyterLab
+
+[role='_abstract']
+You can run pipelines that you have created in JupyterLab from the Pipeline Editor user interface. Before you can run a pipeline, you must create a data science project and a pipeline server. After you create a pipeline server, you must create a workbench within the same project as your pipeline server.
+Your pipeline instance in JupyterLab must contain a runtime configuration. If you create a workbench as part of a data science project, a default runtime configuration is created automatically. However, if you create a notebook from the Jupyter tile in the {productname-short} dashboard, you must create a runtime configuration before you can run your pipeline in JupyterLab. A runtime configuration defines connectivity information for your pipeline instance and S3-compatible cloud storage.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have access to S3-compatible storage.
+* You have created a pipeline in JupyterLab.
+* You have opened your pipeline in the Pipeline Editor in JupyterLab.
+* Your pipeline instance contains a runtime configuration.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the Pipeline Editor user interface, click *Run Pipeline* (image:images/jupyterlab-run-pipeline-button.png[The Runtimes icon]).
++
+The *Run Pipeline* dialog appears. The *Pipeline Name* field is automatically populated with the pipeline file name.
++
+[IMPORTANT]
+====
+You must enter a unique pipeline name. The pipeline name that you enter must not match the name of any previously executed pipelines. 
+====
+. Define the settings for your pipeline run.
+.. From the *Runtime Configuration* list, select the relevant runtime configuration to run your pipeline.
+.. Optional: Configure your pipeline parameters, if applicable. If your pipeline contains nodes that reference pipeline parameters, you can change the default parameter values. If a parameter is required and has no default value, you must enter a value.
+. Click *OK*.
+
+.Verification
+* You can view the output artifacts of your pipeline run. The artifacts are stored in your designated object storage bucket.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id="scheduling-a-pipeline-run_{context}"]
+= Scheduling a pipeline run
+
+[role='_abstract']
+You can instantiate a single execution of a pipeline by scheduling a pipeline run. In {productname-short}, you can schedule runs to occur at specific times or execute them immediately after creation.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a configured pipeline server.
+* You have imported a pipeline to an active pipeline server.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. Click the action menu (*&#8942;*) beside the relevant pipeline and click *Create run*.
++
+The *Create run* page opens.
+. From the *Project* list, select the project that contains the pipeline you want to create a run for.
+. In the *Name* field, enter a name for the run.
+. In the *Description* field, enter a description for the run.
+. From the *Pipeline* list, select the pipeline to create a run for. Alternatively, to upload a new pipeline, click *Upload new pipeline* and fill in the relevant fields in the *Import pipeline* dialog.
+. Configure the run type by performing one of the following sets of actions:
+* Select *Run once immediately after creation* to specify the run executes once, and immediately after its creation.
+* Select *Schedule recurring run* to schedule the run to recur.
+... Configure the run's trigger type.
+.... Select *Periodic* and select the execution frequency from the list.
+.... Select *Cron* to specify the execution schedule in `cron` format. This creates a cron job to execute the run. Click the *Copy* button (image:images/osd-copy.png[]) to copy the cron job schedule to the clipboard. The field furthest to the left represents seconds. For more information about scheduling tasks using the supported `cron` format, see link:https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format[Cron Expression Format].
+... Configure the run's duration.
+.... Select the *Start date* check box to specify a start date for the run. Select the run's start date using the *Calendar* and the start time from the list of times.
+.... Select the *End date* check box to specify an end date for the run. Select the run's end date using the *Calendar* and the end time from the list of times.
+. Configure the input parameters for the run by selecting the parameters from the list.
+. Click *Create*.
+
+.Verification
+* The pipeline run that you created is shown in the *Scheduled* tab on the *Runs* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='sharing-access-to-a-data-science-project_{context}']
+= Sharing access to a data science project
+
+[role='_abstract']
+To enable your organization to work collaboratively, you can share access to your data science project with other users and groups.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. From the list of data science projects, click the name of the data science project that you want to share access to.
++
+A project details page opens.
+. Click the *Permissions* tab.
++
+The *Permissions* page for the project opens.
+. Provide one or more users with access to the project.
+.. In the *Users* section, click *Add user*.
+.. In the *Name* field, enter the user name of the user whom you want to provide access to the project.
+.. From the *Permissions* list, select one of the following access permission levels:
+* Admin: Users with this access level can edit project details and manage access to the project.
+* Edit: Users with this access level can view and edit project components, such as its workbenches, data connections, and storage.
+.. To confirm your entry, click *Confirm* (image:images/rhods-confirm-entry-icon.png[The Confirm icon]).
+.. Optional: To add an additional user, click *Add user* and repeat the process.
+. Provide one or more OpenShift groups with access to the project.
+.. In the *Groups* section, click *Add group*.
+.. From the *Name* list, select a group to provide access to the project.
++
+[NOTE]
+--
+ifndef::upstream[]
+
+ifndef::self-managed[]
+If you do not have `cluster-admin` or `dedicated-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+
+ifdef::self-managed[]
+If you do not have `cluster-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+
+endif::[]
+
+ifdef::upstream[]
+If you do not have `cluster-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+--
+.. From the *Permissions* list, select one of the following access permission levels:
+* Admin: Groups with this access permission level can edit project details and manage access to the project.
+* Edit: Groups with this access permission level can view and edit project components, such as its workbenches, data connections, and storage.
+.. To confirm your entry, click *Confirm* (image:images/rhods-confirm-entry-icon.png[The Confirm icon]).
+.. Optional: To add an additional group, click *Add group* and repeat the process.
+
+.Verification
+* Users to whom you provided access to the project can perform only the actions permitted by their access permission level.
+* The *Users* and *Groups* sections on the *Permissions* tab show the respective users and groups that you provided with access to the project.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="starting-a-workbench_{context}"]
+= Starting a workbench
+
+[role='_abstract']
+You can manually start a data science project's workbench from the *Details* page for the project. By default, workbenches start immediately after you create them.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains a workbench.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project whose workbench you want to start.
++
+The *Details* page for the project opens.
+. Click the toggle in the *Status* column for the relevant workbench to start a workbench that is not running.
++
+The status of the workbench that you started changes from *Stopped* to *Running*. After the workbench has started, click *Open* to open the workbench's notebook.
+
+.Verification
+* The workbench that you started appears on the *Details* page for the project with the status of *Running*.
+
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="stopping-a-triggered-pipeline-run_{context}"]
+= Stopping a triggered pipeline run
+
+[role='_abstract']
+If you no longer require a triggered pipeline run to continue executing, you can stop the run before its defined end date.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* There is a previously created data science project available that contains a pipeline server.
+* You have imported a pipeline to an active and available pipeline server.
+* You have previously triggered a pipeline run.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. From the *Project* list, select the project whose pipeline runs you want to stop.
+. Click the *Triggered* tab.
+. In the *Name* column in the table, click the name of the run that you want to stop.
++
+The *Run details* page opens.
+. From the *Actions* list, select *Stop run*
++
+There might be a short delay while the run stops.
+
+.Verification
+* A list of previously triggered runs are displayed in the *Triggered* tab on the *Runs* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: REFERENCE
+
+[id='supported-browsers_{context}']
+= Supported browsers
+
+[role='_abstract']
+{productname-long} supports the latest version of the following browsers:
+
+* Google Chrome
+* Mozilla Firefox
+* Safari
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: CONCEPT
+
+[id="supported-packages_{context}"]
+= Supported packages
+
+[role="_abstract"]
+Notebook server images in {productname-long} are installed with Python 3.9 by default.
+ifndef::upstream[]
+See the table in link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments] for a complete list of packages and versions included in these images.
+endif::[]
+
+You can install packages that are compatible with Python 3.9 on any notebook server that has the binaries required by that package.
+ifndef::upstream[]
+If the required binaries are not included on the notebook server image you want to use, contact Red Hat Support to request that the binary be considered for inclusion.
+endif::[]
+
+You can install packages on a temporary basis by using the `pip install` command. You can also provide a list of packages to the `pip install` command using a `requirements.txt` file.
+ifndef::upstream[]
+See link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#installing-python-packages-on-your-notebook-server_nb-server[Installing Python packages on your notebook server] for more information.
+endif::[]
+
+You must re-install these packages each time you start your notebook server.
+
+You can remove packages by using the `pip uninstall` command.
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#installing-python-packages-on-your-notebook-server_nb-server[Installing Python packages on your notebook server]
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#options-for-notebook-server-environments_get-started[Options for notebook server environments]
+endif::[]
+:_module-type: REFERENCE
+
+[id='supported-services_{context}']
+= Supported services
+
+[role='_abstract']
+{productname-long} supports the following services:
+
+[id="table-supported-services_{context}"]
+
+.Supported services
+[cols="1,5",header]
+|===
+| Service Name | Description
+
+| Anaconda Professional Edition
+| Anaconda Professional Edition is a popular open source package distribution and management experience that is optimized for commercial use.
+
+| IBM Watson Studio
+a| IBM Watson Studio is a platform for embedding AI and machine learning into your business and creating custom models with your own data.
+
+| Intel&#174; oneAPI AI Analytics Toolkits
+| The AI Kit is a set of AI software tools to accelerate end-to-end data science and analytics pipelines on Intel&#174; architectures.
+
+| Jupyter
+a| Jupyter is a multi-user version of the notebook designed for companies, classrooms, and research labs.
+
+ifndef::upstream[]
+[IMPORTANT]
+====
+While every effort is made to make {productname-long} resilient to OpenShift node failure, upgrades, and similarly disruptive operations, individual users' notebook environments can be interrupted during these events. If an OpenShift node restarts or becomes unavailable, any user notebook environment on that node is restarted on a different node. When this occurs, any ongoing process executing in the user's notebook environment is interrupted, and the user needs to re-execute it when their environment becomes available again.
+
+Due to this limitation, Red Hat recommends that processes for which interruption is unacceptable are not executed in the Jupyter notebook server environment on {productname-short}.
+====
+endif::[]
+
+| Pachyderm
+| Use Pachyderm's data versioning, pipeline and lineage capabilities to automate the machine learning life cycle and optimize machine learning operations.
+
+| Red Hat OpenShift API Management
+| OpenShift API Management is a service that accelerates time-to-value and reduces the cost of delivering API-first, microservices-based applications.
+
+| OpenVINO
+| OpenVINO is an open-source toolkit to help optimize deep learning performance and deploy using an inference engine onto Intel hardware.
+
+| Starburst Galaxy
+| Starburst Galaxy is a fully managed service to run high-performance queries across your various data sources using SQL.
+
+|===
+
+//[role="_additional-resources"]
+//.Additional resources
+//* TODO or delete
+:_module-type: REFERENCE
+
+[id='user-interface_{context}']
+= The {productname-short} user interface
+
+[role='_abstract']
+The {productname-long} interface is based on the OpenShift web console user interface.
+
+The {productname-long} user interface is divided into several areas:
+
+* The global navigation bar, which provides access to useful controls, such as *Help* and *Notifications*.
++
+.The global navigation bar
+ifdef::upstream[]
+image::images/odh-topnav.png[The global navigation bar]
+endif::[]
+ifndef::upstream[]
+image::images/rhods-topnav.png[The global navigation bar]
+endif::[]
+
+* The side navigation menu, which contains different categories of pages available in {productname-short}.
++
+.The side navigation menu
+ifdef::upstream[]
+image::images/odh-sidenav.png[The side navigation menu]
+endif::[]
+ifndef::upstream[]
+image::images/rhods-sidenav.png[The side navigation menu]
+endif::[]
+
+* The main display area, which displays the current page and shares space with any drawers currently displaying information, such as notifications or quick start guides. The main display area also displays the *Notebook server control panel* where you can launch Jupyter by starting and configuring a notebook server. Administrators can also use the *Notebook server control panel* to manage other users' notebook servers.
++
+.The main display area
+ifdef::upstream[]
+image::images/odh-main-area.png[The main display area]
+endif::[]
+ifndef::upstream[]
+image::images/rhods-main-area.png[The main display area]
+endif::[]
+
+== Global navigation
+
+There are four items in the top navigation:
+
+* The *Toggle side navigation menu* button (image:images/rhods-sidenav-toggle-icon.png["Toggle side navigation menu icon",]) toggles whether or not the side navigation is displayed.
+* The *Notifications* button (image:images/rhods-notifications-icon.png["Notifications icon"]) opens and closes the *Notifications* drawer, letting you read current and previous notifications in more detail.
+ifdef::upstream[]
+* The *Help* menu (image:images/rhods-help-icon.png["Help menu icon"]) provides a link to access the {productname-short} documentation.
+endif::[]
+ifndef::upstream[]
+* The *Help* menu (image:images/rhods-help-icon.png["Help menu icon"]) provides a link to create a ticket with Red Hat Support and access the {productname-short} documentation.
+endif::[]
+* The *User* menu displays the name of the currently logged-in user and provides access to the *Log out* button.
+
+== Side navigation
+
+There are three main sections in the side navigation:
+
+Applications -> Enabled:: The *Enabled* page displays applications that are enabled and ready to use on {productname-short}. This page is the default landing page for {productname-short}.
++
+Click the *Launch application* button on an application card to open the application interface in a new tab. If an application has an associated quick start tour, click the drop-down menu on the application's card and select *Open quick start* to access it. This page also displays applications and components that have been disabled by your administrator. Disabled applications are denoted with `Disabled` on the application's card. Click *Disabled* on the application's card to access links allowing you to remove the card itself, and to re-validate its license, if the license had previously expired.
+
+Applications -> Explore:: The *Explore* page displays applications that are available for use with {productname-short}.
+Click on a card for more information about the application or to access the *Enable* button.
+The *Enable* button is visible only if an application does not require an OpenShift Operator installation. 
+
+Data science projects:: The *Data science projects* page allows you to organize your data science work into a single project. From this page, you can create and manage data science projects. You can also enhance the capabilities of your data science project by adding workbenches, adding storage to your project's cluster, adding data connections, and adding model servers.
+
+Data Science Pipelines -> Pipelines:: The *Pipelines* page allows you to import, manage, track, and view data science pipelines. Using {productname-long} pipelines, you can standardize and automate machine learning workflows to enable you to develop and deploy your data science models.
+
+Data Science Pipelines -> Runs:: The *Runs* page allows you to define, manage, and track executions of a data science pipeline. A pipeline run is a single execution of a data science pipeline. You can also view a record of previously executed and scheduled runs for your data science project.
+
+Model Serving:: The *Model Serving* page allows you to manage and view the status of your deployed models. You can use this page to deploy data science models to serve intelligent applications, or to view existing deployed models. You can also determine the inference endpoint of a deployed model.
+
+Resources:: The *Resources* page displays learning resources such as documentation, how-to material, and quick start tours. You can filter visible resources using the options displayed on the left, or enter terms into the search bar.
+
+Settings -> Notebook images:: The *Notebook image settings* page allows you to configure custom notebook images that cater to your project's specific requirements. After you have added custom notebook images to your deployment of {productname-short}, they are available for selection when creating a notebook server.
+
+Settings -> Cluster settings::  The *Cluster settings* page allows you perform the following administrative tasks on your cluster:
+* Enable or disable Red Hat's ability to collect data about {productname-short} usage on your cluster.
+* Configure how resources are claimed within your cluster by changing the default size of the cluster's persistent volume claim (PVC).
+* Reduce resource usage in your {productname-short} deployment by stopping notebook servers that have been idle.
+* Schedule notebook pods on tainted nodes by adding tolerations.
+
+Settings -> User management:: The *User and group settings* page allows you to define {productname-short} user group and admin group membership.
+
+// [role="_additional-resources"]
+// .Additional resources
+// * TODO or delete
+:_module-type: REFERENCE
+
+[id="troubleshooting-common-problems-in-jupyter-for-administrators_{context}"]
+= Troubleshooting common problems in Jupyter for administrators
+
+[role='_abstract']
+If your users are experiencing errors in {productname-long} relating to Jupyter, their notebooks, or their notebook server, read this section to understand what could be causing the problem, and how to resolve the problem.
+
+ifndef::upstream[]
+If you cannot see the problem here or in the release notes, contact Red Hat Support.
+endif::[]
+
+== A user receives a *404: Page not found* error when logging in to Jupyter
+
+.Problem
+If you have configured specialized {productname-short} user groups, the user name might not be added to the default user group for {productname-short}.
+
+.Diagnosis
+Check whether the user is part of the default user group.
+
+. Find the names of groups allowed access to Jupyter.
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+.. Log in to OpenShift Dedicated web console.
+endif::[]
+ifdef::self-managed[]
+.. Log in to OpenShift Container Platform web console.
+endif::[]
+--
+endif::[]
+ifdef::upstream[]
+.. Log in to {productname-short} web console.
+endif::[]
+.. Click *User Management* -> *Groups*.
+.. Click the name of your user group, for example, `rhods-users`.
++
+The *Group details* page for that group appears.
+
+. Click the *Details* tab for the group and confirm that the *Users* section for the relevant group, contains the users who have permission to access Jupyter.
+
+.Resolution
+ifndef::upstream[]
+* If the user is not added to any of the groups allowed access to Jupyter, follow link:{rhodsdocshome}{default-format-url}/managing_users_and_user_resources/adding-users-for-openshift-data-science_useradd[Adding users for {productname-short}] to add them.
+* If the user is already added to a group that is allowed to access Jupyter, contact Red Hat Support.
+endif::[]
+
+ifdef::upstream[]
+If the user is not added to any of the groups allowed access to Jupyter, add them.
+endif::[]
+
+== A user's notebook server does not start
+
+.Problem
+ifdef::upstream[]
+The {openshift-platform} cluster that hosts the user's notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+The OpenShift Dedicated cluster that hosts the user's notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+ifdef::self-managed[]
+The OpenShift Container Platform cluster that hosts the user's notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+--
+endif::[]
+
+.Diagnosis
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+. Log in to OpenShift Dedicated web console.
+endif::[]
+ifdef::self-managed[]
+. Log in to OpenShift Container Platform web console.
+endif::[]
+--
+endif::[]
+ifdef::upstream[]
+. Log in to {productname-short} web console.
+endif::[]
+. Delete and restart the notebook server pod for this user.
+.. Click *Workloads* -> *Pods* and set the *Project* to `rhods-notebooks`.
+
+.. Search for the notebook server pod that belongs to this user, for example, `jupyter-nb-<username>-*`.
++
+If the notebook server pod exists, an intermittent failure may have occurred in the notebook server pod.
++
+If the notebook server pod for the user does not exist, continue with diagnosis.
+. Check the resources currently available in the OpenShift cluster against the resources required by the selected notebook server image.
++
+If worker nodes with sufficient CPU and RAM are available for scheduling in the cluster, continue with diagnosis.
+. Check the state of the Jupyter pod.
+
+
+.Resolution
+* If there was an intermittent failure of the notebook server pod:
+.. Delete the notebook server pod that belongs to the user.
+.. Ask the user to start their notebook server again.
+* If the notebook server does not have sufficient resources to run the selected notebook server image, either add more resources to the OpenShift cluster, or choose a smaller image size.
+ifndef::upstream[]
+* If the Jupyter pod is in a *FAILED* state:
+.. Retrieve the logs for the `jupyter-nb-*` pod and send them to Red Hat Support for further evaluation.
+.. Delete the `jupyter-nb-*` pod.
+* If none of the previous resolutions apply, contact Red Hat Support.
+endif::[]
+
+== The user receives a *database or disk is full* error or a *no space left on device* error when they run notebook cells
+
+.Problem
+The user might have run out of storage space on their notebook server.
+
+.Diagnosis
+. Log in to Jupyter and start the notebook server that belongs to the user having problems. If the notebook server does not start, follow these steps to check whether the user has run out of storage space:
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+.. Log in to OpenShift Dedicated web console.
+endif::[]
+ifdef::self-managed[]
+.. Log in to OpenShift Container Platform web console.
+endif::[]
+--
+endif::[]
+ifdef::upstream[]
+. Log in to {productname-short} web console.
+endif::[]
+.. Click *Workloads* -> *Pods* and set the *Project* to `rhods-notebooks`.
+.. Click the notebook server pod that belongs to this user, for example, `jupyter-nb-<idp>-<username>-*`.
+.. Click *Logs*. The user has exceeded their available capacity if you see lines similar to the following:
++
+----
+Unexpected error while saving file: XXXX database or disk is full
+----
+
+.Resolution
+ifndef::upstream[]
+* Increase the user's available storage by expanding their persistent volume: link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.13/html/storage/expanding-persistent-volumes[Expanding persistent volumes]
+endif::[]
+ifdef::upstream[]
+* Increase the user's available storage by expanding their persistent volume.
+endif::[]
+
+* Work with the user to identify files that can be deleted from the `/opt/app-root/src` directory on their notebook server to free up their existing storage space.
+
+
+// [role='_additional-resources']
+// == Additional resources
+// * TODO
+:_module-type: REFERENCE
+
+[id="troubleshooting-common-problems-in-jupyter-for-users_{context}"]
+= Troubleshooting common problems in Jupyter for users
+
+[role='_abstract']
+If you are seeing errors in {productname-long} related to Jupyter, your notebooks, or your notebook server, read this section to understand what could be causing the problem.
+
+ifndef::upstream[]
+If you cannot see your problem here or in the release notes, contact Red Hat Support.
+endif::[]
+
+== I see a *403: Forbidden* error when I log in to Jupyter
+
+.Problem
+If your administrator has configured specialized {productname-short} user groups, your user name might not be added to the default user group or the default administrator group for {productname-short}.
+
+.Resolution
+ Contact your administrator so that they can add you to the correct group/s.
+
+
+== My notebook server does not start
+
+.Problem
+ifndef::upstream[]
+--
+ifndef::self-managed[]
+The OpenShift Dedicated cluster that hosts your notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+ifdef::self-managed[]
+The OpenShift Platform Container cluster that hosts your notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+--
+endif::[]
+
+ifdef::upstream[]
+The {openshift-platform} cluster that hosts your notebook server might not have access to enough resources, or the Jupyter pod may have failed.
+endif::[]
+
+.Resolution
+Check the logs in the *Events* section in OpenShift for error messages associated with the problem. For example:
+----
+Server requested
+2021-10-28T13:31:29.830991Z [Warning] 0/7 nodes are available: 2 Insufficient memory,
+2 node(s) had taint {node-role.kubernetes.io/infra: }, that the pod didn't tolerate, 3 node(s) had taint {node-role.kubernetes.io/master: },
+that the pod didn't tolerate.
+----
+Contact your administrator with details of any relevant error messages so that they can perform further checks.
+
+
+== I see a *database or disk is full* error or a *no space left on device* error when I run my notebook cells
+
+.Problem
+You might have run out of storage space on your notebook server.
+
+.Resolution
+Contact your administrator so that they can perform further checks.
+
+// [role='_additional-resources']
+// == Additional resources
+// * TODO
+:_module-type: REFERENCE
+
+[id='tutorials-for-data-scientists_{context}']
+= Tutorials for data scientists
+
+[role='_abstract']
+To help you get started quickly, you can access learning resources for {productname-long} and its supported applications. These resources are available on the *Resources* tab of the {productname-long} user interface.
+
+ifndef::upstream[]
+[id="learning-resources-tutorials_{context}"]
+.Tutorials
+
+|===
+| Resource Name | Description
+
+| Accelerating scientific workloads in Python with Numba
+| Watch a video about how to make your Python code run faster.
+
+| Building interactive visualizations and dashboards in Python
+| Explore a variety of data across multiple notebooks and learn how to deploy full dashboards and applications.
+
+| Building machine learning models with scikit-learn
+| Learn how to build machine learning models with scikit-learn for supervised learning, unsupervised learning, and classification problems.
+
+| Building a binary classification model
+| Train a model to predict if a customer is likely to subscribe to a bank promotion.
+
+| Choosing Python tools for data visualization
+| Use the PyViz.org website to help you decide on the best open source Python data visualization tools for you.
+
+| Exploring Anaconda for data science
+| Learn about Anaconda, a freemium open source distribution of the Python and R programming languages.
+
+| Getting started with Pachyderm concepts
+| Learn Pachyderm's main concepts by creating pipelines that perform edge detection on a few images.
+
+| GPU Computing in Python with Numba
+| Learn how to create GPU accelerated functions using Numba.
+
+| Run a Python notebook to generate results in IBM Watson OpenScale
+| Run a Python notebook to create, train, and deploy a machine learning model.
+
+| Running an AutoAI experiment to build a model
+| Watch a video about building a binary classification model for a marketing campaign.
+
+| Training a regression model in Pachyderm
+| Learn how to create a sample housing data repository using a Pachyderm cluster to run experiments, analyze data, and set up regression.
+
+| Using Dask for parallel data analysis
+| Analyze medium-sized datasets in parallel locally using Dask, a parallel computing library that scales the existing Python ecosystem.
+
+| Using Jupyter notebooks in Watson Studio
+| Watch a video about working with Jupyter notebooks in Watson Studio.
+
+| Using Pandas for data analysis in Python
+| Learn how to use pandas, a data analysis library for the Python programming language.
+|===
+endif::[]
+
+[id="learning-resources-quickstarts_{context}"]
+
+.Quick start guides
+
+ifndef::upstream[]
+|===
+| Resource Name | Description
+
+| Creating a Jupyter notebook
+| Create a Jupyter notebook in JupyterLab.
+
+| Creating a Machine Learning Model using the NVIDIA GPU Add-on
+| Creating a Machine Learning model on Jupyter that uses the GPUs that you have made available.
+
+| Creating an Anaconda-enabled Jupyter notebook
+| Create an Anaconda-enabled Jupyter notebook and access Anaconda packages that are curated for security and compatibility.
+
+| Deploying a model with Watson Studio
+| Import a notebook in Watson Studio and use AutoAI to build and deploy a model.
+
+| Deploying a sample Python application using Flask and OpenShift
+| Deploy your data science model out of a Jupyter notebook and into a Flask application to use as a development sandbox.
+
+| Importing Pachyderm Beginner Tutorial Notebook
+| Load Pachyderm's beginner tutorial notebook and learn about Pachyderm's main concepts such as data repositories, pipelines, and using the pachctl CLI from your cells.
+
+| Installing and verifying the NVIDIA GPU Add-on
+| Learn how to install and verify that Jupyter detects the GPUs available for use.
+
+| Opening and updating a SKLearn model with canary deployment
+| Open a SKLearn model and update it using canary deployment practices.
+
+| Querying data with Starburst Galaxy
+| Learn to query data using Starburst Galaxy from a Jupyter notebook.
+
+| Securing a deployed model using Red Hat OpenShift API Management
+| Protect a model service API using Red Hat OpenShift API Management.
+
+| Using the Intel&#174; oneAPI AI Analytics Toolkit (AI Kit) Notebook
+| Run a data science notebook sample with the Intel&#174; oneAPI AI Analytics Toolkit.
+
+| Using the OpenVINO toolkit
+| Quantize an ONNX computer vision model using the OpenVINO model optimizer and use the result for inference from a notebook.
+
+|===
+endif::[]
+
+ifdef::upstream[]
+|===
+| Resource Name | Description
+
+| Creating a Jupyter notebook
+| Create a Jupyter notebook in JupyterLab.
+
+| Deploying a sample Python application using Flask and OpenShift
+| Deploy your data science model out of a Jupyter notebook and into a Flask application to use as a development sandbox.
+
+|===
+endif::[]
+
+[id="learning-resources-howtos_{context}"]
+
+.How to guides
+
+ifndef::upstream[]
+|===
+| Resource Name | Description
+
+| How to choose between notebook runtime environment options
+| Explore available options for configuring your notebook runtime environment.
+
+| How to clean, shape, and visualize data
+| Learn how to clean and shape tabular data using IBM Watson Studio data refinery.
+
+| How to create a connection to access data
+| Learn how to create connections to various data sources across the platform.
+
+| How to create a deployment space
+| Learn how to create a deployment space for machine learning.
+
+| How to create a notebook in Watson Studio
+| Learn how to create a basic Jupyter notebook in Watson Studio.
+
+| How to create a project in Watson Studio
+| Learn how to create an analytics project in Watson Studio.
+
+| How to create a project that integrates with Git
+| Learn how to add assets from a Git repository into a project.
+
+| How to install Python packages on your notebook server
+| Learn how to install additional Python packages on your notebook server.
+
+| How to load data into a Jupyter notebook
+| Learn how to integrate data sources into a Jupyter notebook by loading data.
+
+| How to serve a model using OpenVINO Model Server
+| Learn how to deploy optimized models with the OpenVINO Model Server using OpenVINO custom resources.
+
+| How to set up Watson OpenScale
+| Learn how to track and measure outcomes from models with OpenScale.
+
+| How to update notebook server settings
+| Learn how to update the settings or the notebook image on your notebook server.
+
+| How to use data from Amazon S3 buckets
+| Learn how to connect to data in S3 Storage using environment variables.
+
+| How to view installed packages on your notebook server
+| Learn how to see which packages are installed on your running notebook server.
+
+|===
+endif::[]
+
+ifdef::upstream[]
+|===
+| Resource Name | Description
+
+| How to install Python packages on your notebook server
+| Learn how to install additional Python packages on your notebook server.
+
+| How to update notebook server settings
+| Learn how to update the settings or the notebook image on your notebook server.
+
+| How to use data from Amazon S3 buckets
+| Learn how to connect to data in S3 Storage using environment variables.
+
+| How to view installed packages on your notebook server
+| Learn how to see which packages are installed on your running notebook server.
+
+|===
+endif::[]
+//[role="_additional-resources"]
+//Additional resources
+//TODO or delete
+:_module-type: PROCEDURE
+
+[id='updating-access-to-a-data-science-project_{context}']
+= Updating access to a data science project
+
+[role='_abstract']
+To change the level of collaboration on your data science project, you can update the access permissions of users and groups who have access to your project.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project.
+* You have previously shared access to your project with other users or groups.
+* You have administrator permissions or you are the project owner.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project that you want to change the access permissions of.
++
+A project details page opens.
+. Click the *Permissions* tab.
++
+The *Permissions* page for the project opens.
+. Update the user access permissions to the project.
+.. In the *Name* field, update the user name of the user whom you want to provide access to the project.
+.. From the *Permissions* list, update the user access permissions by selecting one of the following:
+* Admin: Users with this access level can edit project details and manage access to the project.
+* Edit: Users with this access level can view and edit project components, such as its workbenches, data connections, and storage.
+.. To confirm the update to the entry, click *Confirm* (image:images/rhods-confirm-entry-icon.png[The Confirm icon]).
+. Update the OpenShift groups access permissions to the project.
+.. From the *Name* list, update the group that has access to the project by selecting another group from the list.
++
+[NOTE]
+--
+ifndef::upstream[]
+ifndef::self-managed[]
+If you do not have `cluster-admin` or `dedicated-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+ifdef::self-managed[]
+If you do not have `cluster-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+endif::[]
+
+ifdef::upstream[]
+If you do not have `cluster-admin` permissions, the *Name* list is not visible. Instead, an input field is displayed enabling you to configure group permissions.
+endif::[]
+--
+.. From the *Permissions* list, update the group access permissions by selecting one of the following:
+* Admin: Groups with this access permission level can edit project details and manage access to the project.
+* Edit: Groups with this access permission level can view and edit project components, such as its workbenches, data connections, and storage.
+.. To confirm the update to the entry, click *Confirm* (image:images/rhods-confirm-entry-icon.png[The Confirm icon]).
+
+.Verification
+* The *Users* and *Groups* sections on the *Permissions* tab show the respective users and groups whose project access permissions you changed.
+
+//[role="_additional-resources"]
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="updating-a-connected-data-source_{context}"]
+= Updating a connected data source
+
+[role='_abstract']
+To use an existing data source with a different workbench, you can change the data source that is connected to your project's workbench.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project, created a workbench, and you have defined a data connection.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project whose data source you want to change.
++
+A project details page opens.
+. Click the action menu (*&#8942;*) beside the data source that you want to change in the *Data connections* section and click *Change connected workbenches*.
++
+The *Update connected workbenches* dialog opens.
+. Select an existing *workbench* to connect the data source to from the list.
+. Click *Update connected workbenches*.
+
+.Verification
+* The data connection that you changed is displayed in the *Data connections* section on the project *Details* page.
+* You can access your S3 data source using environment variables in the connected workbench.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="updating-a-data-science-project_{context}"]
+= Updating a data science project
+
+[role='_abstract']
+You can update your data science project's details by changing your project's name and description text.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the action menu (*&#8942;*) beside the project whose details you want to update and click *Edit project*.
++
+The *Edit data science project* dialog opens.
+. Optional: Update the *name* for your data science project.
+. Optional: Update the *description* for your data science project.
+. Click *Update*.
+
+.Verification
+* The data science project that you updated is displayed on the *Data science projects* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="updating-a-model-server_{context}"]
+= Updating a model server
+
+[role='_abstract']
+You can update your data science project's model server by changing details, such as the number of deployed replicas, the server size, the token authorization, and how the project is accessed.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that has a model server assigned.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project whose model server details you want to update.
++
+A project details page opens.
+. In the *Models and model servers* section, locate the model server you want to update. Click the action menu (*&#8942;*)   and select *Edit model server*.
++
+The *Configure model server* dialog opens.
+. Update the model server properties, as follows:
++
+NOTE: You cannot change the *Serving runtime* selection for a model server that is already configured. This protects against changing to a runtime that does not support already-deployed models.
+
+.. In the *Model server name* field, enter a new, unique name for the model server.
+
+.. In the *Number of model replicas to deploy* field, specify a value.
+.. From the *Model server size* list, select one of the following server sizes:
+* Small
+* Medium
+* Large
+* Custom
+.. Optional: If you selected *Custom* in the preceding step, configure the following settings in the *Model server size* section to customize your model server:
+... In the *CPUs requested* field, specify a number of CPUs to use with your model server. Use the list beside this field to specify the value in cores or millicores.
+... In the *CPU limit* field, specify the maximum number of CPUs to use with your model server. Use the list beside this field to specify the value in cores or millicores.
+... In the *Memory requested* field, specify the requested memory for the model server in gibibytes (Gi).
+... In the *Memory limit* field, specify the maximum memory limit for the model server in gibibytes (Gi).
+.. Optional: In the *Model server GPUs* field, specify a number of GPUs to use with your model server.
++
+[IMPORTANT]
+====
+{productname-short} includes two versions of the OpenVINO Model Server (OVMS) runtime by default; a version that supports GPUs and one that does not. To use GPUs, from the *Serving runtime* list, you must select the version whose display name includes `Supports GPUs`.
+
+If you are using a _custom_ model-serving runtime with your model server, you must ensure that your custom runtime supports GPUs and is appropriately configured to use them.
+====
+
+.. Optional: In the *Model route* section, select the *Make deployed models available through an external route* check box to make your deployed models available to external clients.
+.. Optional: In the *Token authorization* section, select the *Require token authentication* check box to require token authentication for your model server. To finish configuring token authentication, perform the following actions:
+... In the *Service account name* field, enter a service account name for which the token will be generated. The generated token is created and displayed in the *Token secret* field when the model server is configured.
+... To add an additional service account, click *Add a service account* and enter another service account name.
+. Click *Configure*.
+
+.Verification
+* The model server that you updated is displayed in the *Models and model servers* section on the project details page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="updating-a-project-workbench_{context}"]
+= Updating a project workbench
+
+[role='_abstract']
+If your data science work requires you to change your workbench's notebook image, container size, or identifying information, you can modify the properties of your project's workbench.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains a workbench.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project whose workbench you want to update.
++
+The *Details* page for the project opens.
+. Click the action menu (*&#8942;*) beside the workbench that you want to update in the *Workbenches* section and click *Edit workbench*.
++
+The *Edit workbench* page opens.
+. Update the workbench's properties.
+.. Update the *name* for your workbench, if applicable.
+.. Update *description* for your workbench, if applicable.
+.. Select a new *notebook image* to use for your workbench server, if applicable.
+.. Select a new *container size* for your server, if applicable.
+. Click *Update workbench*.
+
+.Verification
+* The workbench that you updated appears on the *Details* page for the project.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="updating-a-runtime-configuration_{context}"]
+= Updating a runtime configuration
+
+[role='_abstract']
+To ensure that your runtime configuration is accurate and updated, you can change the settings of an existing runtime configuration.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have access to S3-compatible storage.
+* You have created a data science project that contains a workbench.
+* You have created and configured a pipeline server within the data science project that contains your workbench.
+* A previously created runtime configuration is available in the JupyterLab interface.
+* You have created and launched a Jupyter server from a notebook image that contains the Elyra extension (Standard data science, TensorFlow, TrustyAI, or  PyTorch).
+
+.Procedure
+. In the left sidebar of JupyterLab, click *Runtimes* (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]).
+. Hover the cursor over the runtime configuration that you want to update and click the *Edit* button (image:images/rhods-edit-icon.png[Edit runtime configuration]).
++
+The *Data Science Pipelines runtime configuration* page opens.
+. Fill in the relevant fields to update your runtime configuration.
+.. In the *Display Name* field, update name for your runtime configuration, if applicable.
+.. Optional: In the *Description* field, update the description of your runtime configuration, if applicable.
+.. Optional: In the *Tags* field, click *Add Tag* to define a category for your pipeline instance. Enter a name for the tag and press Enter.
+.. Define the credentials of your data science pipeline:
+... In the *Data Science Pipelines API Endpoint* field, update the API endpoint of your data science pipeline, if applicable. Do not specify the pipelines namespace in this field.
+... In the *Public Data Science Pipelines API Endpoint* field, update the API endpoint of your data science pipeline, if applicable.
+... Optional: In the *Data Science Pipelines User Namespace* field, update the relevant user namespace to run pipelines, if applicable.
+... From the *Data Science Pipelines engine* list, select `Tekton`.
+... From the *Authentication Type* list, select a new authentication type required to authenticate your pipeline, if applicable.
++
+[IMPORTANT]
+====
+If you created a notebook directly from the Jupyter tile on the dashboard, select `EXISTING_BEARER_TOKEN` from the *Authentication Type* list.
+====
+... In the *Data Science Pipelines API Endpoint Username* field, update the user name required for the authentication type, if applicable.
+... In the *Data Science Pipelines API Endpoint Password Or Token*, update the password or token required for the authentication type, if applicable.
++
+[IMPORTANT]
+====
+To obtain the Data Science Pipelines API endpoint token, in the upper-right corner of the OpenShift web console, click your user name and select *Copy login command*. After you have logged in, click *Display token* and copy the value of `--token=` from the *Log in with this token* command.
+====
+.. Define the connectivity information of your S3-compatible storage:
+... In the *Cloud Object Storage Endpoint* field, update the endpoint of your S3-compatible storage, if applicable. For more information about Amazon s3 endpoints, see link:https://docs.aws.amazon.com/general/latest/gr/s3.html[Amazon Simple Storage Service endpoints and quotas].
+... Optional: In the *Public Cloud Object Storage Endpoint* field, update the URL of your S3-compatible storage, if applicable.
+... In the *Cloud Object Storage Bucket Name* field, update the name of the bucket where your pipeline artifacts are stored, if applicable. If the bucket name does not exist, it is created automatically.
+... From the *Cloud Object Storage Authentication Type* list, update the authentication type required to access to your S3-compatible cloud storage, if applicable. If you use AWS S3 buckets, you must select `USER_CREDENTIALS` from the list.
+... Optional: In the *Cloud Object Storage Credentials Secret* field, update the secret that contains the storage user name and password, if applicable. This secret is defined in the relevant user namespace. You must save the secret on the cluster that hosts your pipeline runtime.
+... Optional: In the *Cloud Object Storage Username* field, update the user name to connect to your S3-compatible cloud storage, if applicable. If you use AWS S3 buckets, update your AWS Secret Access Key ID.
+... Optional: In the *Cloud Object Storage Password* field, update the password to connect to your S3-compatible cloud storage, if applicable. If you use AWS S3 buckets, update your AWS Secret Access Key.
+.. Click *Save & Close*.
+
+.Verification
+* The runtime configuration that you updated is shown in the *Runtimes* tab (image:images/jupyter-runtimes-sidebar.png[The Runtimes icon]) in the left sidebar of JupyterLab.
+
+//[role='_additional-resources']
+//.Additional resources//
+:_module-type: PROCEDURE
+
+[id="updating-cluster-storage_{context}"]
+= Updating cluster storage
+
+[role='_abstract']
+If your data science work requires you to change the identifying information of a project's cluster storage or the workbench that the storage is connected to, you can update your project's cluster storage to change these properties.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have created a data science project that contains cluster storage.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Projects*.
++
+The *Data science projects* page opens.
+. Click the name of the project whose storage you want to update.
++
+The *Details* page for the project opens.
+. Click the action menu (*&#8942;*) beside the storage that you want to update in the *Cluster storage* section and click *Edit storage*.
++
+The *Edit storage* page opens.
+. Update the storage's properties.
+.. Update the *name* for the storage, if applicable.
+.. Update the *description* for the storage, if applicable.
+.. Increase the *Persistent storage size* for the storage, if applicable. 
++
+Note that you can only increase the storage size. Updating the storage size restarts the workbench and makes it unavailable for a period of time that is usually proportional to the size change.
+.. Update the *workbench* that the storage is connected to, if applicable.
+.. If you selected a new workbench to connect the storage to, enter the storage directory in the *Mount folder* field.
+. Click *Update storage*.
+
+If you increased the storage size, the workbench restarts and is unavailable for a period of time that is usually proportional to the size change.
+
+.Verification
+* The storage that you updated appears in the *Cluster storage* section on the *Details* page for the project.
+
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+//pv2hash: 27b84eb2-ec2f-4a25-b2b7-c9865e24167e
+
+[id="updating-notebook-server-settings-by-restarting-your-server_{context}"]
+= Updating notebook server settings by restarting your server
+
+[role='_abstract']
+You can update the settings on your notebook server by stopping and relaunching the notebook server. For example, if your server runs out of memory, you can restart the server to make the container size larger.
+
+.Prerequisites
+* A running notebook server.
+* Log in to Jupyter.
+
+.Procedure
+. Click *File* -> *Hub Control Panel*.
++
+The *Notebook server control panel* opens.
+. Click the *Stop notebook server* button.
++
+The *Stop server* dialog opens.
+. Click *Stop server* to confirm your decision.
++
+The *Start a notebook server* page opens.
+. Update the relevant notebook server settings and click *Start server*.
+
+.Verification
+* The notebook server starts and contains your updated settings.
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+ifdef::self-managed[]
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#launching-jupyter-and-starting-a-notebook-server_get-started[Launching Jupyter and starting a notebook server]
+endif::[]
+ifndef::self-managed[]
+* link:{rhodsdocshome}{default-format-url}/getting_started_with_{url-productname-long}/creating-a-project-workbench_get-started#launching-jupyter-and-starting-a-notebook-server_get-started[Launching Jupyter and starting a notebook server]
+endif::[]
+endif::[]:_module-type: PROCEDURE
+
+[id="updating-the-deployment-properties-of-a-deployed-model_{context}"]
+= Updating the deployment properties of a deployed model
+
+[role='_abstract']
+You can update the deployment properties of a model that has been deployed previously. This allows you to change the model's data connection and name.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users`) in OpenShift.
+endif::[]
+* You have deployed a model on {productname-short}.
+
+.Procedure
+. From the {productname-short} dashboard, click *Model serving*.
++
+The *Model Serving* page opens.
+. Click the action menu (*&#8942;*) beside the model whose deployment properties you want to update and click *Edit*.
++
+The *Deploy model* dialog opens.
+. Update the deployment properties of the model as follows:
+.. In the *Model Name* field, enter a new, unique name for the model.
+.. From the *Model framework* list, select a framework for your model. 
++
+NOTE: The *Model framework* list shows only the frameworks that are supported by the model-serving runtime that you specified when you configured your model server.
+
+.. To update how you have specified the location of your model, perform one of the following sets of actions:
++
+--
+* *If you previously specified an existing data connection*
+... In the *Folder path* field, update the folder path that contains the model in your specified data source.
+
+* *If you previously specified a new data connection*
+... In the *Name* field, update the name of the data connection.
+... In the *AWS_ACCESS_KEY_ID* field, update your access key ID for Amazon Web Services (AWS).
+... In the *AWS_SECRET_ACCESS_KEY* field, update your secret access key for the AWS account you specified.
+... In the *AWS_S3_ENDPOINT* field, update the endpoint of your AWS S3 storage.
+... In the *AWS_DEFAULT_REGION* field, update the default region of your AWS account.
+... In the *AWS_S3_BUCKET* field, update the name of the AWS S3 bucket.
+... In the *Folder path* field, update the folder path in your AWS S3 bucket that contains your data file. 
+--
+
+.. Click *Configure*.
+
+.Verification
+* The model whose deployment properties you updated is displayed on the *Model Serving* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id='updating-your-project-with-changes-from-a-remote-git-repository_{context}']
+= Updating your project with changes from a remote Git repository
+
+[role='_abstract']
+You can pull changes made by other users into your data science project from a remote Git repository.
+
+.Prerequisites
+* You have configured the remote Git repository.
+* You have already imported the Git repository into JupyterLab, and the contents of the repository are visible in the file browser in JupyterLab.
+* You have permissions to pull files from the remote Git repository to your local repository.
+* You have credentials for logging in to Jupyter.
+* You have a launched and running Jupyter server.
+
+.Procedure
+. In the JupyterLab interface, click the *Git* button (image:images/jupyter-git-sidebar.png[Git button]).
+. Click the *Pull latest changes* button (image:images/jupyter-git-pull-button.png[Pull latest changes button]).
+
+
+.Verification
+* You can view the changes pulled from the remote repository in the *History* tab of the Git pane.
+
+
+// [role="_additional-resources"]
+//.Additional resources
+// * TODO or delete
+:_module-type: PROCEDURE
+
+[id='uploading-an-existing-notebook-file-from-a-git-repository-using-jupyterlab_{context}']
+= Uploading an existing notebook file from a Git repository using JupyterLab
+
+[role='_abstract']
+You can use the JupyterLab user interface to clone a Git repository into your workspace to continue your work or integrate files from an external project.
+
+.Prerequisites
+* A launched and running Jupyter server.
+* Read access for the Git repository you want to clone.
+
+.Procedure
+. Copy the HTTPS URL for the Git repository.
++
+** On GitHub, click *&#10515; Code* -> *HTTPS* and click the Clipboard button.
+** On GitLab, click *Clone* and click the Clipboard button under *Clone with HTTPS*.
+. In the JupyterLab interface, click the *Git Clone* button (image:images/jupyterlab-git-clone-button.png[Git Clone button]).
++
+You can also click *Git* -> *Clone a repository* in the menu, or click the Git icon (image:images/jupyterlab-git-button.png[Git button]) and click the *Clone a repository* button.
++
+The _Clone a repo_ dialog appears.
+. Enter the HTTPS URL of the repository that contains your notebook.
+. Click *CLONE*.
+. If prompted, enter your username and password for the Git repository.
+
+.Verification
+* Check that the contents of the repository are visible in the file browser in JupyterLab, or run the *ls* command in the terminal to verify that the repository is shown as a directory.
+
+// [role="_additional-resources"]
+// .Additional resources
+// * TODO or delete
+:_module-type: PROCEDURE
+
+[id='uploading-an-existing-notebook-file-from-a-git-repository-using-the-command-line-interface_{context}']
+= Uploading an existing notebook file from a Git repository using the command line interface
+
+[role='_abstract']
+You can use the command line interface to clone a Git repository into your workspace to continue your work or integrate files from an external project.
+
+.Prerequisites
+* A launched and running Jupyter server.
+
+.Procedure
+. Copy the HTTPS URL for the Git repository.
++
+** On GitHub, click *&#10515; Code* -> *HTTPS* and click the Clipboard button.
+** On GitLab, click *Clone* and click the Clipboard button under *Clone with HTTPS*.
+. In JupyterLab, click *File* -> *New* -> *Terminal* to open a terminal window.
+. Enter the `git clone` command.
++
+[source,subs="+quotes"]
+----
+git clone _<git-clone-URL>_
+----
++
+Replace _`<git-clone-URL>`_ with the HTTPS URL, for example:
++
+[source,subs="+quotes"]
+----
+[1234567890@jupyter-nb-jdoe ~]$ *git clone https://github.com/example/myrepo.git*
+Cloning into 'myrepo'...
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (10/10), done.
+remote: Total 2821 (delta 1), reused 5 (delta 1), pack-reused 2810
+Receiving objects: 100% (2821/2821), 39.17 MiB | 23.89 MiB/s, done.
+Resolving deltas: 100% (1416/1416), done.
+----
+
+// . In the JupyterLab interface, click *Git* -> *Clone a repository*.
+// +
+// The _Clone a repo_ dialog appears.
+// . Enter the HTTPS URL of the repository that contains your notebook.
+// . Click *CLONE*.
+// . If prompted, enter your username and password for the Git repository.
+
+.Verification
+* Check that the contents of the repository are visible in the file browser in JupyterLab, or run the *ls* command in the terminal to verify that the repository is shown as a directory.
+
+// [role="_additional-resources"]
+// .Additional resources
+// * TODO or delete
+:_module-type: PROCEDURE
+
+[id='uploading-an-existing-notebook-file-from-local-storage_{context}']
+= Uploading an existing notebook file from local storage
+
+[role='_abstract']
+You can load an existing notebook from local storage into JupyterLab to continue work, or adapt a project for a new use case.
+
+.Prerequisites
+* Credentials for logging in to Jupyter.
+* A launched and running notebook server.
+* A notebook file exists in your local storage.
+
+.Procedure
+. In the *File Browser* in the left sidebar of the JupyterLab interface, click *Upload Files* (image:images/jupyter-upload-file.png[Upload Files]).
+. Locate and select the notebook file and click *Open*.
++
+The file is displayed in the *File Browser*.
+
+.Verification
+* The notebook file displays in the *File Browser* in the left sidebar of the JupyterLab interface.
+* You can open the notebook file in JupyterLab.
+
+
+// [role="_additional-resources"]
+// .Additional resources
+// * TODO or delete
+:_module-type: PROCEDURE
+
+[id="viewing-a-deployed-model_{context}"]
+= Viewing a deployed model
+
+[role='_abstract']
+To analyse the results of your work, you can view a list of deployed models on {productname-long}. You can also view the current statuses of deployed models and their endpoints.
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users`) in OpenShift.
+endif::[]
+* There are active and deployed data science models available on the *Model Serving* page.
+
+.Procedure
+. From the {productname-short} dashboard, click *Model Serving*.
++
+The *Model Serving* page opens.
+. Review the list of deployed models.
++
+Inference endpoints are displayed in the *Inference endpoint* column in the *Deployed models* table.
+. Optional: Click the *Copy* button (image:images/osd-copy.png[]) on the relevant row to copy the model's inference endpoint to the clipboard.
+
+.Verification
+* A list of previously deployed data science models is displayed on the *Model Serving* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="viewing-existing-pipelines_{context}"]
+= Viewing existing pipelines
+
+[role='_abstract']
+You can view the details of pipelines that you have imported to {productname-long}, such as the pipeline's last run, when it was created, and the pipeline's executed runs.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a pipeline server.
+* You have imported a pipeline to an active and available pipeline server.
+* The pipeline you imported is available, or there are other previously imported pipelines available to view.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the relevant project whose pipelines you want to view.
+. Study the pipelines on the list.
+. Optional: Click *Expand* (image:images/rhods-expand-icon.png[]) on the relevant row to view the pipeline's executed runs. If the pipeline does not contain any runs, click *Create run* to create one.
+
+.Verification
+* A list of previously created data science pipelines is displayed on the *Pipelines* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+//pv2hash: 55b41598-ac2e-4719-a284-ceda9bb94b19
+
+[id="viewing-python-packages-installed-on-your-notebook-server_{context}"]
+= Viewing Python packages installed on your notebook server
+
+[role='_abstract']
+You can check which Python packages are installed on your notebook server and which version of the package you have by running the `pip` tool in a notebook cell.
+
+.Prerequisites
+* Log in to Jupyter and open a notebook.
+
+.Procedure
+
+. Enter the following in a new cell in your notebook:
++
+[source,role="execute"]
+----
+!pip list
+----
+. Run the cell.
+
+.Verification
+* The output shows an alphabetical list of all installed Python packages and their versions. For example, if you use this command immediately after creating a notebook server that uses the *Minimal* image, the first packages shown are similar to the following:
++
+[source,subs="+quotes"]
+----
+Package                           Version
+--------------------------------- ----------
+aiohttp                           3.7.3
+alembic                           1.5.2
+appdirs                           1.4.4
+argo-workflows                    3.6.1
+argon2-cffi                       20.1.0
+async-generator                   1.10
+async-timeout                     3.0.1
+attrdict                          2.0.1
+attrs                             20.3.0
+backcall                          0.2.0
+----
+
+ifndef::upstream[]
+[role="_additional-resources"]
+.Additional resources
+* link:{rhodsdocshome}{default-format-url}/working_on_data_science_projects/working-on-data-science-projects_nb-server#installing-python-packages-on-your-notebook-server_nb-server[Installing Python packages on your notebook server]
+endif::[]
+:_module-type: PROCEDURE
+
+[id="viewing-scheduled-pipeline-runs_{context}"]
+= Viewing scheduled pipeline runs
+
+[role='_abstract']
+You can view a list of pipeline runs that are scheduled for execution in {productname-short}. From this list, you can view details relating to your pipeline's runs, such as the pipeline that the run belongs to. You can also view the run's status, execution frequency, and schedule.
+
+.Prerequisites
+
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* You have installed the OpenShift Pipelines operator.
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* You have installed the Data Science Pipelines operator.
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a pipeline server.
+* You have imported a pipeline to an active and available pipeline server.
+* You have created and scheduled a pipeline run.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. From the *Project* list, select the project whose scheduled pipeline runs you want to view.
+. Click the *Scheduled* tab.
+. Study the table showing a list of scheduled runs.
++
+After a run has been scheduled, the run's status is displayed in the *Status* column in the table, indicating whether the run is ready for execution or unavailable for execution. To enable or disable a previously imported notebook image, on the row containing the relevant notebook image, click the toggle in the *Enabled* column.
+
+.Verification
+* A list of scheduled runs are displayed in the *Scheduled* tab on the *Runs* page.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="viewing-the-details-of-a-pipeline-run_{context}"]
+= Viewing the details of a pipeline run
+[role='_abstract']
+To gain a clearer understanding of your pipeline runs, you can view the details of a previously triggered pipeline run, such as its graph, execution details, and run output.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a pipeline server.
+* You have imported a pipeline to an active and available pipeline server.
+* You have previously triggered a pipeline run.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project whose pipeline runs you want to view.
+. For a pipeline that you want to see run details for, click *Expand* (image:images/rhods-expand-icon.png[]).
+. From the *Runs* section, click the name of the run that you want to view the details of.
++
+The *Run details* page opens.
+
+.Verification
+* On the *Run details* page, you can view the run's graph, execution details, input parameters, and run output.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="viewing-the-details-of-a-pipeline-server_{context}"]
+= Viewing the details of a pipeline server
+
+[role='_abstract']
+You can view the details of pipeline servers configured in {productname-short}, such as the pipeline's data connection details and where its data is stored.
+
+.Prerequisites
+* You have installed the OpenShift Pipelines operator.
+* You have logged in to {productname-long}.
+* You have previously created a data science project that contains an active and available pipeline server.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Pipelines*.
++
+The *Pipelines* page opens.
+. From the *Project* list, select the project whose pipeline server you want to view.
+. From the *Pipeline server actions* list, select *View pipeline server configuration*.
+. When you have finished inspecting the pipeline server's details, click *Done*.
+
+.Verification
+* You can view the relevant pipeline server's details in the *View pipeline server* dialog.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="viewing-the-performance-metrics-of-a-deployed-model_{context}"]
+= Viewing the performance metrics of a deployed model
+
+[role='_abstract']
+To ensure that your deployed model is functioning correctly, you can monitor the model's performance metrics. The following metrics are tracked in {productname-short}:
+
+* Requests per day (x100)
+* Average response time (ms)
+* CPU utilization (%)
+* Memory utilization (%)
+
+.Prerequisites
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admins`) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* There are deployed data science models available on the *Model Serving* page.
+
+.Procedure
+. From the {productname-short} dashboard, click *Model Serving*.
++
+The *Model Serving* page opens.
+. Click the model whose performance metrics you want to view.
++
+The *Metrics* page opens.
+
+.Verification
+* The *Metrics* page displays the performance metrics for the relevant model.
+
+//[role='_additional-resources']
+//.Additional resources
+:_module-type: PROCEDURE
+
+[id="viewing-triggered-pipeline-runs_{context}"]
+= Viewing triggered pipeline runs
+
+[role='_abstract']
+You can view a list of pipeline runs that were previously executed in {productname-short}. From this list, you can view details relating to your pipeline's runs, such as the pipeline that the run belongs to, along with the run's status, duration, and execution start time.
+
+.Prerequisites
+
+* You have logged in to {productname-long}.
+ifndef::upstream[]
+* You have installed the OpenShift Pipelines operator.
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `rhods-users` or `rhods-admin` ) in OpenShift.
+endif::[]
+ifdef::upstream[]
+* You have installed the Data Science Pipelines operator.
+* If you are using specialized {productname-short} groups, you are part of the user group or admin group (for example, `odh-users` or `odh-admins`) in OpenShift.
+endif::[]
+* You have previously created a data science project that is available and contains a pipeline server.
+* You have imported a pipeline to an active and available pipeline server.
+* You have previously triggered a pipeline run.
+
+.Procedure
+. From the {productname-short} dashboard, click *Data Science Pipelines* -> *Runs*.
++
+The *Runs* page opens.
+. From the *Project* list, select the project whose previously executed pipeline runs you want to view.
++
+The *Run details* page opens.
+. Click the *Triggered* tab.
++
+A table opens that shows list of triggered runs. After a run has completed its execution, the run's status is displayed in the *Status* column in the table, indicating whether the run has succeeded or failed.
+
+.Verification
+* A list of previously triggered runs are displayed in the *Triggered* tab on the *Runs* page.
+
+//[role='_additional-resources']
+//.Additional resources
