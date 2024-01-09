@@ -65,7 +65,7 @@ After training, add the code to convert the model to ONNX format.
 
 
 * Upload the model to S3.
-Use the `4.model_upload` notebook.
+Use the `5.model_upload` notebook.
 
 * Create a data science pipeline.
  Note that, in the [pipelines quick course](https://redhatquickcourses.github.io/rhods-pipelines/rhods-pipelines/1.33/index.html) you already created a pipeline for offline scoring, that is, for classification of unlabeled transactions given a pretrained model file.
