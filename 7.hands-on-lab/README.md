@@ -10,11 +10,10 @@ Your task is to complete the missing parts of those notebooks and create a data 
 
 > **❗ IMPORTANT**
 >
-> Before working on this exercise, make sure that you have taken RHODS quick courses:
+> Before working on this exercise, make sure that you have taken the following courses:
 >
 > * [Introduction to Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-intro)
 > * [Red Hat OpenShift AI Administration](https://redhatquickcourses.github.io/rhods-admin)
-> * [Data Analysis and Visualization with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-analysis)
 > * [Creating Machine Learning Models with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-model)
 > * [Deploying Machine Learning Models with Red Hat OpenShift AI](https://redhatquickcourses.github.io/rhods-deploy)
 > * [Automation using Data Science Pipelines](https://redhatquickcourses.github.io/rhods-pipelines)
