@@ -11,6 +11,12 @@
 # TODO - Add the command to copy the requirements file    #
 ###########################################################
 
+# Installing custom packages
+###########################################################
+# TODO - Add the command to install the requirements      #
+###########################################################
+
+
 
 # Fix permissions to support pip in Openshift environments \
 RUN chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
