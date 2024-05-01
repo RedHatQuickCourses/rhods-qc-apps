@@ -9,7 +9,7 @@ def predict(data_folder='./data'):
     X = load(f'{data_folder}/samples.npy').astype('float32')
 
     session = InferenceSession('model.onnx')
-    raw_results = session.run([], {'dense_input': X})[0]
+    raw_results = session.run([], {'dense_3_input': X})[0]
 
     results = argmax(raw_results, axis=1)
     class_map_array = array(['no fraud', 'fraud'])
