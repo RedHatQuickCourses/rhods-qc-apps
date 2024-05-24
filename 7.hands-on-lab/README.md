@@ -26,7 +26,7 @@ The lab scenario assumes that the dataset is available in the same `fraud-detect
 
 You will also use the same bucket to store the trained model and pipeline output reports.
 
-The dataset is a CSV file called `credictcard.csv`.
+The dataset is a CSV file called `live-data.csv`.
 
 
 > **NOTE**
@@ -52,7 +52,7 @@ Make sure that the workbench size is at least `Small`.
 The materials for this lab are located in the `7.hands-on-lab/` directory.
 
 * Collect the data.
-Use the `1.collect` notebook to download the `creditcard.csv` file into `data/creditcard.csv`.
+Use the `1.collect` notebook to download the `live-data.csv` file into `data/creditcard.csv`.
 
 * Explore and preprocess data.
 Use the `2.exploration` and `3.preprocessing` notebooks.
