@@ -27,4 +27,4 @@ def predict(data_folder='./data'):
 
 
 if __name__ == '__main__':
-    predict(data_folder='/data')
+    predict(data_folder='.')
